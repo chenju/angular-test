@@ -4,3 +4,5 @@
 
 **/typings/**/*.d.ts
 **/typings/tsd.cached.json
+
+npm-debug.log
