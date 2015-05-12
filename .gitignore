@@ -2,6 +2,9 @@
 
 /node_modules/
 
+.sass-cache
+/bower_components/
+
 **/typings/**/*.d.ts
 **/typings/tsd.cached.json
 
