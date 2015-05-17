@@ -2,7 +2,7 @@
 
 import {Component, bootstrap, View} from "angular2/angular2";
 import {Settings} from "./setting";
-import {MdProgressLinear} from "./component/progress-linear/progress_linear"
+import {MdProgressLinear} from "./src/component/progress-linear/progress_linear"
 
 
 class Constants 

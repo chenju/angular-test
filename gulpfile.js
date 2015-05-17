@@ -8,16 +8,22 @@ var exec = require('child_process').exec;
 var gulp = require('gulp');
 var gulpPlugins = require('gulp-load-plugins')();
 var sass = require('gulp-sass');
+
 //var shell = require('gulp-shell');
-//var runSequence = require('run-sequence');
+var runSequence = require('run-sequence');
 //var madge = require('madge');
 //var merge = require('merge');
 //var merge2 = require('merge2');
 var path = require('path');
-//var semver = require('semver');
+var semver = require('semver');
 var watch = require('gulp-watch');
 
-//var clean = require('./tools/build/clean');
+var clean = require('./tools/build/clean');
+
+
+var plumber = require('gulp-plumber');
+var rename = require('gulp-rename');
+var traceur = require('gulp-traceur');
 //var transpile = require('./tools/build/transpile');
 //var pubget = require('./tools/build/pubget');
 //var linknodemodules = require('./tools/build/linknodemodules');
@@ -33,7 +39,7 @@ var watch = require('gulp-watch');
 //var sourcemaps = require('gulp-sourcemaps');
 //var tsc = require('gulp-typescript');
 //var util = require('./tools/build/util');
-//var bundler = require('./tools/build/bundle');
+var bundler = require('./tools/build/bundle');
 //var replace = require('gulp-replace');
 //var insert = require('gulp-insert');
 
@@ -83,31 +89,122 @@ var angularBuilder = {
 
 
 var CONFIG = {
-  dest: {
-    js: {
-      all: 'dist/js',
-      dev: {
-        es6: 'dist/js/dev/es6',
-        es5: 'dist/js/dev/es5'
-      },
-      prod: {
-        es6: 'dist/js/prod/es6',
-        es5: 'dist/js/prod/es5'
-      },
-      cjs: 'dist/js/cjs',
-      dart2js: 'dist/js/dart2js'
+    src: {
+      js: 'modules/src/**/*.js',
+      html: 'src/**/*.html',
+      scss: 'modules/src/**/*.scss'
     },
-    dart: 'dist/dart',
-    docs: 'dist/docs'
-  },
-  formatDart: {
-    packageName: 'dart_style',
-    args: ['dart_style:format', '-w', 'dist/dart']
-  }
+    lib: [
+      'node_modules/gulp-traceur/node_modules/traceur/bin/traceur-runtime.js',
+      'node_modules/es6-module-loader/dist/es6-module-loader-sans-promises.src.js',
+      'node_modules/systemjs/lib/extension-register.js',
+      'node_modules/angular2/node_modules/zone.js/zone.js',
+      'node_modules/angular2/node_modules/zone.js/long-stack-trace-zone.js'
+    ],
+    dest:{
+      js:'dist/js'
+    }
 };
 
 gulp.task('build/clean.tools', function() {
   del(path.join('dist', 'tools'));
 });
 
-gulp.task('default', ['build/clean.tools']);
+gulp.task('build/clean.js', clean(gulp, gulpPlugins, {
+  path: CONFIG.dest.js
+}));
+
+gulp.task('clean',['build/clean.js','build/clean.tools'])
+
+
+
+
+
+//安装支持库
+gulp.task('libs', ['angular2'], function () {
+    var size = require('gulp-size');
+    return gulp.src(CONFIG.lib)
+      .pipe(size({showFiles: true, gzip: true}))
+      .pipe(gulp.dest('dist/lib'));
+});
+
+//打包安装angular
+gulp.task('angular2', function () {
+
+  var buildConfig = {
+    paths: {
+      "angular2/*": "node_modules/angular2/es6/prod/*.es6",
+      "rx": "node_modules/angular2/node_modules/rx/dist/rx.js"
+    }
+  };
+
+  var Builder = require('systemjs-builder');
+  var builder = new Builder(buildConfig);
+
+  return builder.build('angular2/angular2', 'dist/lib/angular2.js', {});
+});
+
+
+
+
+//打包编译为es5
+gulp.task('build.js.prod', function () {
+    return gulp.src(CONFIG.src.js)
+        .pipe(rename({extname: ''})) //hack, see: https://github.com/sindresorhus/gulp-traceur/issues/54
+        .pipe(plumber())
+        .pipe(traceur({
+            
+            moduleName: false,
+            annotations: true,
+            types: true,
+            memberVariables: true
+        }))
+        .pipe(rename({extname: '.js'})) //hack, see: https://github.com/sindresorhus/gulp-traceur/issues/54
+        .pipe(gulp.dest(CONFIG.dest.js));
+});
+
+gulp.task('build.js.material', function(done) {
+  runSequence('build.js.dev', 'build.css.material', done);
+});
+
+gulp.task('build.css.material', function() {
+  return gulp.src(CONFIG.src.scss)
+      .pipe(sass())
+      .pipe(autoprefixer())
+      .pipe(gulp.dest(CONFIG.dest.js))
+});
+
+
+var bundleConfig = {
+  paths: {
+    "xiaoan/*": "dist/js/*.js",
+    "rx": "node_modules/rx/dist/rx.js"
+  },
+  modules:'instantiate',
+
+  meta: {
+    // auto-detection fails to detect properly here - https://github.com/systemjs/builder/issues/123
+    'rx': {
+        format: 'cjs'
+      },
+    'angular/angular': {
+      build: false
+    } ,
+    'angular2/angular2': {
+      build: false
+    }  
+    }
+};
+
+gulp.task('bundle.js.prod', ['build.js.prod'], function() {
+  return bundler.bundle(
+      bundleConfig,
+      'xiaoan/hello',
+      './dist/build/main.js',
+      {
+        sourceMaps: true
+      });
+});
+
+
+

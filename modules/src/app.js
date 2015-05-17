@@ -12,7 +12,7 @@ if (typeof __metadata !== "function") __metadata = function (k, v) {
 };
 var angular2_1 = require("angular2/angular2");
 var setting_1 = require("./setting");
-var progress_linear_1 = require("./component/progress-linear/progress_linear");
+var progress_linear_1 = require("./src/component/progress-linear/progress_linear");
 var Constants = (function () {
     function Constants() {
     }

@@ -1,11 +1,23 @@
 <html>
+
 <head>
-	<title>Angular 2 Quickstart</title>
-	<script src="https://github.jspm.io/jmcriffey/bower-traceur-runtime@0.0.87/traceur-runtime.js"></script>
-	<script src="https://jspm.io/system@0.16.js"></script>
-	<script type="text/javascript" src="bundle/angular2.dev.js"></script>
+    <title>Angular 2 Quickstart</title>
+    <script src="../../dist/traceur-runtime.min.js"></script>
+    <script src="../../dist/System.js"></script>
+    <script src="dist/lib/es5/angular2.dev2.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="css/main.css?t=1111"/>
 </head>
-<my-app>loading</my-app>
-<script >System.import("app");</script>
+<my-app></my-app>
+<script>
+
+   System.paths={
+
+   	'app':'app.es6'
+   }
+
+
+System.import("app");
+</script>
 
 </html>

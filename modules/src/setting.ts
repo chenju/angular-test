@@ -1,4 +1,5 @@
 
+
 export class Settings{
 	static get Default():any {
         return {
