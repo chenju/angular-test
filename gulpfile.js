@@ -13,7 +13,7 @@ var sass = require('gulp-sass');
 var runSequence = require('run-sequence');
 //var madge = require('madge');
 //var merge = require('merge');
-//var merge2 = require('merge2');
+var merge2 = require('merge2');
 var path = require('path');
 var semver = require('semver');
 var watch = require('gulp-watch');
@@ -36,8 +36,8 @@ var traceur = require('gulp-traceur');
 //var karma = require('karma');
 //var minimist = require('minimist');
 //var runServerDartTests = require('./tools/build/run_server_dart_tests');
-//var sourcemaps = require('gulp-sourcemaps');
-//var tsc = require('gulp-typescript');
+var sourcemaps = require('gulp-sourcemaps');
+var tsc = require('gulp-typescript');
 //var util = require('./tools/build/util');
 var bundler = require('./tools/build/bundle');
 //var replace = require('gulp-replace');
@@ -90,9 +90,9 @@ var angularBuilder = {
 
 var CONFIG = {
     src: {
-      js: 'modules/src/**/*.js',
-      html: 'src/**/*.html',
-      scss: 'modules/src/**/*.scss'
+      js: 'modules/isence/src/**/*.js',
+      html: 'modules/isence/src/**/*.html',
+      scss: 'modules/isence/src/**/*.scss'
     },
     lib: [
       'node_modules/gulp-traceur/node_modules/traceur/bin/traceur-runtime.js',
@@ -102,7 +102,9 @@ var CONFIG = {
       'node_modules/angular2/node_modules/zone.js/long-stack-trace-zone.js'
     ],
     dest:{
-      js:'dist/js'
+      js:'dist/js',
+      css:'dist/css',
+      html:'dist'
     }
 };
 
@@ -147,7 +149,7 @@ gulp.task('angular2', function () {
 
 
 
-//打包编译为es5
+//js编译为es5
 gulp.task('build.js.prod', function () {
     return gulp.src(CONFIG.src.js)
         .pipe(rename({extname: ''})) //hack, see: https://github.com/sindresorhus/gulp-traceur/issues/54
@@ -164,46 +166,70 @@ gulp.task('build.js.prod', function () {
 });
 
 gulp.task('build.js.material', function(done) {
-  runSequence('build.js.dev', 'build.css.material', done);
+  runSequence('build.js.prod', 'build.css.material', done);
 });
+
+//编译css 
+
+
 
 gulp.task('build.css.material', function() {
   return gulp.src(CONFIG.src.scss)
+      .pipe(plumber())
       .pipe(sass())
       .pipe(autoprefixer())
+      .pipe(plumber.stop())
       .pipe(gulp.dest(CONFIG.dest.js))
 });
 
 
-var bundleConfig = {
-  paths: {
-    "xiaoan/*": "dist/js/*.js",
-    "rx": "node_modules/rx/dist/rx.js"
-  },
-  modules:'instantiate',
 
-  meta: {
-    // auto-detection fails to detect properly here - https://github.com/systemjs/builder/issues/123
-    'rx': {
-        format: 'cjs'
-      },
-    'angular/angular': {
-      build: false
-    } ,
-    'angular2/angular2': {
-      build: false
-    }  
-    }
-};
+gulp.task('html', function() {
+    return gulp.src(CONFIG.src.html)
 
-gulp.task('bundle.js.prod', ['build.js.prod'], function() {
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('bundle.js.prod', function() {
   return bundler.bundle(
-      bundleConfig,
-      'xiaoan/hello',
-      './dist/build/main.js',
+      "./tools/build/bundle.config.js",
+      'isence/*',
+      './dist/build/isence.js',
       {
         sourceMaps: true
       });
+});
+
+gulp.task('build.tools', ['build/clean.tools'], function(done) {
+  runSequence('!build.tools', done);
+});
+
+
+// private task to build tools
+gulp.task('!build.tools', function() {
+  var tsResult = gulp.src(['tools/**/*.ts'])
+      .pipe(sourcemaps.init())
+      .pipe(tsc({target: 'ES5', module: 'commonjs', reporter: tsc.reporter.nullReporter(),
+                 // Don't use the version of typescript that gulp-typescript depends on, we need 1.5
+                 // see https://github.com/ivogabe/gulp-typescript#typescript-version
+                 typescript: require('typescript')}))
+      .on('error', function(error) {
+        // gulp-typescript doesn't propagate errors from the src stream into the js stream so we are
+        // forwarding the error into the merged stream
+        mergedStream.emit('error', error);
+      });
+
+  var destDir = gulp.dest('dist/tools/');
+
+  var mergedStream = merge2([
+    tsResult.js.pipe(sourcemaps.write('.')).pipe(destDir),
+    tsResult.js.pipe(destDir)
+  ]).on('end', function() {
+    var MyBuilder = require('./dist/tools/broccoli/my_builder').MyBuilder;
+    angularBuilder = new MyBuilder('dist');
+  });
+
+  return mergedStream;
 });
 
 
