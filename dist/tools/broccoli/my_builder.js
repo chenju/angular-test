@@ -2,6 +2,7 @@ var broccoli = require('broccoli');
 var fse = require('fs-extra');
 var makeBrowserTree = require('./trees/browser_tree');
 var printSlowTrees = require('broccoli-slow-trees');
+var path = require('path');
 var MyBuilder = (function () {
     function MyBuilder(outputPath) {
         this.outputPath = outputPath;

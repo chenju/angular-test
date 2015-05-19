@@ -43,12 +43,14 @@ var bundler = require('./tools/build/bundle');
 //var replace = require('gulp-replace');
 //var insert = require('gulp-insert');
 
+var Funnel = require('broccoli-funnel');
+
 
 function throwToolsBuildMissingError() {
   throw new Error('ERROR: build.tools task should have been run before using angularBuilder');
 }
 
-var angularBuilder = {
+var myBuilder = {
   rebuildBrowserDevTree: throwToolsBuildMissingError,
   rebuildBrowserProdTree: throwToolsBuildMissingError,
   rebuildNodeTree: throwToolsBuildMissingError,
@@ -102,7 +104,7 @@ var CONFIG = {
       'node_modules/angular2/node_modules/zone.js/long-stack-trace-zone.js'
     ],
     dest:{
-      js:'dist/js',
+      js:'dist/js/prod/sence',
       css:'dist/css',
       html:'dist'
     }
@@ -226,11 +228,19 @@ gulp.task('!build.tools', function() {
     tsResult.js.pipe(destDir)
   ]).on('end', function() {
     var MyBuilder = require('./dist/tools/broccoli/my_builder').MyBuilder;
-    angularBuilder = new MyBuilder('dist');
+    myBuilder = new MyBuilder('dist');
   });
 
   return mergedStream;
 });
+
+gulp.task('build.tree.prod', function() {
+  var MyBuilder = require('./dist/tools/broccoli/my_builder').MyBuilder;
+  myBuilder = new MyBuilder('dist');
+  return myBuilder.rebuildBrowserProdTree();
+});
+
+
 
 
 

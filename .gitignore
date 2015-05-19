@@ -2,6 +2,9 @@
 
 /node_modules/
 
+# Or broccoli working directory
+tmp
+
 .sass-cache
 /bower_components/
 
