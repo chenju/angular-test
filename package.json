@@ -36,6 +36,7 @@
     "gulp-replace": "^0.5.3",
     "gulp-sass": "2.0.0",
     "gulp-shell": "^0.4.1",
+    "gulp-size": "^1.2.1",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-traceur": "^0.17.1",
     "gulp-typescript": "^2.7.3",

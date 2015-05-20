@@ -1,7 +1,7 @@
 
 
 import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If} from 'angular2/angular2';
-import {Fuck} from 'fuck';
+import {Fuck} from 'services/fuck';
 
 
 @Component({

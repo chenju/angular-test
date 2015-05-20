@@ -43,14 +43,12 @@ var bundler = require('./tools/build/bundle');
 //var replace = require('gulp-replace');
 //var insert = require('gulp-insert');
 
-var Funnel = require('broccoli-funnel');
-
 
 function throwToolsBuildMissingError() {
   throw new Error('ERROR: build.tools task should have been run before using angularBuilder');
 }
 
-var myBuilder = {
+var angularBuilder = {
   rebuildBrowserDevTree: throwToolsBuildMissingError,
   rebuildBrowserProdTree: throwToolsBuildMissingError,
   rebuildNodeTree: throwToolsBuildMissingError,
@@ -97,16 +95,16 @@ var CONFIG = {
       scss: 'modules/isence/src/**/*.scss'
     },
     lib: [
-      'node_modules/gulp-traceur/node_modules/traceur/bin/traceur-runtime.js',
+      'node_modules/traceur/bin/traceur-runtime.js',
       'node_modules/es6-module-loader/dist/es6-module-loader-sans-promises.src.js',
       'node_modules/systemjs/lib/extension-register.js',
       'node_modules/angular2/node_modules/zone.js/zone.js',
       'node_modules/angular2/node_modules/zone.js/long-stack-trace-zone.js'
     ],
     dest:{
-      js:'dist/js/prod/sence',
-      css:'dist/css',
-      html:'dist'
+      js: 'dist/js/prod/isence/src',
+      css:'dist/js/prod/isence/src',
+      html:'dist/js/prod/isence/src'
     }
 };
 
@@ -121,17 +119,23 @@ gulp.task('build/clean.js', clean(gulp, gulpPlugins, {
 gulp.task('clean',['build/clean.js','build/clean.tools'])
 
 
-
-
+var prod_path ='dist/lib'
+ 
 
 //安装支持库
 gulp.task('libs', ['angular2'], function () {
     var size = require('gulp-size');
     return gulp.src(CONFIG.lib)
       .pipe(size({showFiles: true, gzip: true}))
-      .pipe(gulp.dest('dist/lib'));
+      .pipe(gulp.dest( prod_path));
 });
 
+
+gulp.task('libs.prod',function(){
+     
+    prod_path = "dist/js/prod/isence/src/lib"
+    runSequence('libs')
+})
 //打包安装angular
 gulp.task('angular2', function () {
 
@@ -145,7 +149,7 @@ gulp.task('angular2', function () {
   var Builder = require('systemjs-builder');
   var builder = new Builder(buildConfig);
 
-  return builder.build('angular2/angular2', 'dist/lib/angular2.js', {});
+  return builder.build('angular2/angular2', path.join(prod_path,'angular2.js'), {});
 });
 
 
@@ -188,8 +192,8 @@ gulp.task('build.css.material', function() {
 
 gulp.task('html', function() {
     return gulp.src(CONFIG.src.html)
-
-        .pipe(gulp.dest('dist'));
+        .pipe(plumber())
+        .pipe(gulp.dest(CONFIG.dest.html));
 });
 
 gulp.task('bundle.js.prod', function() {
@@ -228,19 +232,11 @@ gulp.task('!build.tools', function() {
     tsResult.js.pipe(destDir)
   ]).on('end', function() {
     var MyBuilder = require('./dist/tools/broccoli/my_builder').MyBuilder;
-    myBuilder = new MyBuilder('dist');
+    angularBuilder = new MyBuilder('dist');
   });
 
   return mergedStream;
 });
-
-gulp.task('build.tree.prod', function() {
-  var MyBuilder = require('./dist/tools/broccoli/my_builder').MyBuilder;
-  myBuilder = new MyBuilder('dist');
-  return myBuilder.rebuildBrowserProdTree();
-});
-
-
 
 
 
