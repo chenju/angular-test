@@ -1,0 +1,90 @@
+<style>
+.md-progress_circular-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #460b05;
+    left: 0;
+    top: 0;
+    -webkit-transform-style: preserve-3d
+}
+
+.md-progress-linear-circular.md-ready {
+    transform: translate(0, 0) scale(1, 1);
+}
+
+.md-progress_circular_wrp {
+    position: absolute;
+    width: 100px;
+    height: 150px;
+    overflow: hidden;
+    left: 50%;
+    top: 40%;
+    margin: -50px 0 0 -50px
+}
+
+.md-progress_circular_bar {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    overflow: hidden;
+    clip: rect(0 30px 60px 0);
+    -webkit-animation: loading 1.2s linear infinite;
+    -moz-animation: loading 1.2s linear infinite;
+    -o-animation: loading 1.2s linear infinite;
+    -ms-animation: loading 1.2s linear infinite;
+    animation: loading 1.2s linear infinite
+}
+
+.md-progress_circular_bar1 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50px;
+    overflow: hidden;
+    background: #fff;
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(rgba(255, 255, 255, 1)), to(rgba(255, 255, 255, 0)));
+    background: -moz-linear-gradient(top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+    background: -ms-linear-gradient(top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))
+}
+
+.md-progress_circular_bar1::before {
+    content: '';
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    overflow: hidden;
+    border-radius: 27px;
+    background-color: #000222;
+    left: 3px;
+    top: 3px
+}
+
+.md-progress_circular_text {
+    font-weight: normal;
+    position: absolute;
+    display: block;
+    width: 100%;
+    font-size: 32px;
+    line-height: 40px;
+    bottom: 0px;
+    color: #fff;
+    text-align: center
+}
+
+
+</style>
+<div class='md-progress_circular-container md-ready'>
+    <div class="md-progress_circular_wrp">
+        <div class="md-progress_circular_bar">
+            <div class="md-progress_circular_bar_1"></div>
+        </div>
+        <b class="md-progress_circular_text">{{value}}</b>
+    </div>
+</div>

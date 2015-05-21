@@ -161,7 +161,7 @@ gulp.task('build.js.prod', function () {
         .pipe(rename({extname: ''})) //hack, see: https://github.com/sindresorhus/gulp-traceur/issues/54
         .pipe(plumber())
         .pipe(traceur({
-            
+            modules: 'instantiate',
             moduleName: false,
             annotations: true,
             types: true,
