@@ -21,21 +21,19 @@ System.register(["angular2/angular2", "services/fuck", "component/progress-circu
     execute: function() {
       Hello = (function() {
         function Hello() {
-          this.name = 'World';
-          var $__0 = this;
           setTimeout((function() {
-            var a = new Fuck();
-            $__0.name = a.name;
+            var a = new loadAsset(init);
           }), 1000);
-          MdProgressCircular();
         }
-        return ($traceurRuntime.createClass)(Hello, {}, {});
+        return ($traceurRuntime.createClass)(Hello, {init: function() {
+            console.log(fuck);
+          }}, {});
       }());
       $__export("Hello", Hello);
       Object.defineProperty(Hello, "annotations", {get: function() {
           return [new Component({selector: 'hello'}), new View({
-            template: "<span *if=\"name\">Hello, {{name}}!</span>",
-            directives: [If]
+            template: "<span *if=\"name\">Hello, {{name}}!</span>\n               <loading></loading>",
+            directives: [If, loadAsset]
           })];
         }});
       bootstrap(Hello);

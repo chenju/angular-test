@@ -9,18 +9,21 @@ import {MdProgressCircular} from 'component/progress-circular/progress_circular'
     selector: 'hello'
 })
 @View({
-    template: `<span *if="name">Hello, {{name}}!</span>`,
-    directives: [If]
+    template: `<span *if="name">Hello, {{name}}!</span>
+               <loading></loading>`,
+    directives: [If,loadAsset]
 })
 export class Hello {
-    name: string = 'World';
+    name:String;
     constructor() {
         setTimeout(() => {
-          var a =new Fuck()
-          this.name = a.name
-          //console.log(Fuck)
+          
+           var a= new loadAsset(init)
+          
         }, 1000);
-        MdProgressCircular()
+    }
+    init(){
+      console.log(fuck)
     }
     
 }
