@@ -1,8 +1,7 @@
 
 
 import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If} from 'angular2/angular2';
-import {Fuck} from 'services/fuck';
-import {MdProgressCircular} from 'component/progress-circular/progress_circular'
+import {loadAsset} from 'loadAsset'
 
 
 @Component({
@@ -16,14 +15,14 @@ import {MdProgressCircular} from 'component/progress-circular/progress_circular'
 export class Hello {
     name:String;
     constructor() {
-        setTimeout(() => {
+        setTimeout(()=> {
           
-           var a= new loadAsset(init)
+           console.log()
           
         }, 1000);
     }
     init(){
-      console.log(fuck)
+      console.log('fuck')
     }
     
 }

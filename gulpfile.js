@@ -156,7 +156,7 @@ gulp.task('angular2', function () {
 
 
 //js编译为es5
-gulp.task('build.js.prod', function () {
+gulp.task('build.js.prod', ['html'],function () {
     return gulp.src(CONFIG.src.js)
         .pipe(rename({extname: ''})) //hack, see: https://github.com/sindresorhus/gulp-traceur/issues/54
         .pipe(plumber())

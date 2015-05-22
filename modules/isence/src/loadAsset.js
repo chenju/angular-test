@@ -1,11 +1,12 @@
-//import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If} from 'angular2/angular2';
+import {MdProgressCircular} from 'Component/progress-circular/progress_circular'
+import {Hello} from 'hello'
 
-@
-Component({
+@Component({
     selector: 'loading'
 })
 
-@ View({
+@View({
     template: '<md-progress-circular [value]="progress"><md-progress-circular>',
     directives: [If, MdProgressCircular]
 })
@@ -16,8 +17,10 @@ export class loadAsset {
     loaded: number;
     t: number;
     s: number = 60;
-    constructor() {
+
+    constructor(b:Hello) {
         this.progress = 0;
+        b.init()
     }
 
     step(s: number) {
@@ -41,12 +44,6 @@ export class loadAsset {
     }
     o() {
         0 >= s ? loaded / t > .5 ? u() : alert("加载图片失败，请返回刷新尝试!") : (s -= .5, loaded == t ? u() : setTimeout(o, 500))
-    }
-    //var u= function(){}
-
-    return function(e) {
-        typeof e == "function" && (u = e),
-            o()
     }
 
 }

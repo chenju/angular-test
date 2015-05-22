@@ -1,11 +1,10 @@
-System.register(["angular2/angular2", "services/fuck", "component/progress-circular/progress_circular"], function($__export) {
+System.register(["angular2/angular2", "loadAsset"], function($__export) {
   "use strict";
   var Component,
       View,
       bootstrap,
       If,
-      Fuck,
-      MdProgressCircular,
+      loadAsset,
       Hello;
   return {
     setters: [function($__m) {
@@ -14,19 +13,17 @@ System.register(["angular2/angular2", "services/fuck", "component/progress-circu
       bootstrap = $__m.bootstrap;
       If = $__m.If;
     }, function($__m) {
-      Fuck = $__m.Fuck;
-    }, function($__m) {
-      MdProgressCircular = $__m.MdProgressCircular;
+      loadAsset = $__m.loadAsset;
     }],
     execute: function() {
       Hello = (function() {
         function Hello() {
           setTimeout((function() {
-            var a = new loadAsset(init);
+            console.log();
           }), 1000);
         }
         return ($traceurRuntime.createClass)(Hello, {init: function() {
-            console.log(fuck);
+            console.log('fuck');
           }}, {});
       }());
       $__export("Hello", Hello);
