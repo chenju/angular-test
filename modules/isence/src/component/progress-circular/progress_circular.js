@@ -6,7 +6,6 @@ import {Math} from 'angular2/src/facade/math';
 
 @Component({
   selector: 'md-progress-circular',
-  lifecycle: [onChange],
   properties: {'value':'value'},
   hostProperties: {'value':'value'}
 })
@@ -32,12 +31,7 @@ export class MdProgressCircular {
       this.value_ = MdProgressCircular.clamp(v);
     }
   }
-
-  onChange(_) {
-
-  	//console.log(this.value)
-
-  }
+  
   static clamp(v) {
     return Math.max(0, Math.min(100, v));
   }

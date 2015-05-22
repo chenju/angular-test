@@ -18,8 +18,9 @@ System.register(["angular2/angular2", "loadAsset"], function($__export) {
     execute: function() {
       Hello = (function() {
         function Hello() {
+          var $__0 = this;
           setTimeout((function() {
-            console.log();
+            $__0.name = "a";
           }), 1000);
         }
         return ($traceurRuntime.createClass)(Hello, {init: function() {

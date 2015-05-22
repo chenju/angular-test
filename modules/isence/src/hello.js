@@ -17,7 +17,7 @@ export class Hello {
     constructor() {
         setTimeout(()=> {
           
-           console.log()
+           this.name="a"
           
         }, 1000);
     }

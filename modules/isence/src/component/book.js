@@ -1,22 +1,20 @@
 //preloading
 import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ViewContainerRef} from 'angular2/angular2';
-import {MdProgressCircular} from 'Component/progress-circular/progress_circular'
 import {DOM} from 'angular2/src/dom/dom_adapter';
 import {Main} from 'main'
-import {Parent} from 'angular2/src/core/annotations_impl/visibility';
 
 
 @Component({
-    selector: 'loading'
+    selector: 'wrapper'
 })
 
 @View({
-    template: '<md-progress-circular [value]="progress" [hidden]="!visible"><md-progress-circular>',
-    directives: [If, MdProgressCircular]
+    template: 'component/book.html',
+    directives: [If]
 })
 
 
-export class loadAsset {
+export class Book {
     progress: number;
     loaded: number=0;
     t: number;

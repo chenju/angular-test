@@ -32,8 +32,7 @@ System.register(["angular2/src/core/annotations_impl/annotations", "angular2/src
             if (isPresent(v)) {
               this.value_ = MdProgressCircular.clamp(v);
             }
-          },
-          onChange: function(_) {}
+          }
         }, {clamp: function(v) {
             return Math.max(0, Math.min(100, v));
           }});
@@ -42,7 +41,6 @@ System.register(["angular2/src/core/annotations_impl/annotations", "angular2/src
       Object.defineProperty(MdProgressCircular, "annotations", {get: function() {
           return [new Component({
             selector: 'md-progress-circular',
-            lifecycle: [onChange],
             properties: {'value': 'value'},
             hostProperties: {'value': 'value'}
           }), new View({templateUrl: 'component/progress-circular/progress_circular.html'})];
