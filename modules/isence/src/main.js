@@ -1,41 +1,283 @@
 
 import {Injectable} from 'angular2/src/di/annotations_impl';
-import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If} from 'angular2/angular2';
-import {loadAsset} from 'loadAsset'
-
+import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ElementRef,onChange, onAllChangesDone} from 'angular2/angular2';
+import {loadAsset} from 'loadAsset';
+import {Parent} from 'angular2/src/core/annotations_impl/visibility';
+import {ListWrapper} from 'angular2/src/facade/collection';
+import {Math} from 'angular2/src/facade/math';
+import {StringWrapper, isPresent, isString, NumberWrapper, RegExpWrapper} from 'angular2/src/facade/lang';
+import {Directive} from 'angular2/src/core/annotations_impl/annotations';
 
 
 @Component({
     selector: 'myapp',
     injectables:[SettingService],
+    
     hostListeners: {
     'window:resize': 'onResize($event)'
-    }
+    },
+    lifecycle: [onChange]
+
 })
 @View({
-    template: `<loading></loading>
-               <wrapper></wrapper>`,
-    directives: [If,loadAsset]
+    templateUrl:'demo.html',
+    directives: [loadAsset,Mdsence,Mdpage]
     
 })
 export class Main {
     name:String;
+    senceWidth:string;
+    senceHeight:string;
+    _pageCount:number;
     greeting:string;
-    constructor(service:SettingService) {
-       
-      console.log(service.pageW)
+    constructor(set:SettingService) {
 
+       this.senceWidth=set.pageW
+       this.senceHeight=set.pageH
+       this.pageCount=1
+       this.setSize()
+
+      
     }
     init(){
+      
       console.log('fuck')
     }
 
     onResize(event) {
-       console.log(event.target)
-       this.name=1
+
+       
+       //this.senceHeight=`${this.width}px`
+       this.setSize()
+       
     }
+
+    set pageCount(value){
+
+      this._pageCount=value
+      this.setSize()
+
+    }
+    get pageCount(){
+      return this._pageCount
+    }
+
+
+    setSize(){
+
+       var h = this.pageCount*document.documentElement.clientHeight
+       this.senceHeight= `${h}px`
+       this.senceWidth = `${document.documentElement.clientWidth}px`
+
+    }
+
+    onChange(_){
+
+       this.setSize()
+
+    }
+
+    transformForValue(value) {
+    // TODO(jelbourn): test perf gain of caching these, since there are only 101 values.
+    var scale = value / 100;
+    var translateX = (value - 100) / 2;
+    return `translateX(${translateX}%) scale(${scale}, 1)`;
+  }
     
 }
+
+
+@Component({
+    selector: 'md-sence',
+    Properties:{
+       'rowHeight': 'pageH'
+    },
+    lifecycle: [onAllChangesDone]
+})
+@View({
+    template: `<div class="md-grid-list">
+  <content></content>
+</div>`
+    
+})
+export class Mdsence {
+   
+   pages:List<Mdpage>;
+   rows: number;
+   fixedRowHeight:string;
+   m:Main;
+
+   
+
+  constructor(m:Main){
+    this.pages = [];
+    this.rows = 0;
+    this.m=m
+    
+    console.log('md-sence')
+  }
+
+  set rowHeight(value){
+    this.fixedRowHeight=value
+  }
+
+  layoutPages() {
+
+    //var tracker = new PageCoordinator(this.pages);
+    this.rows=this.pages.length
+    
+    this.m.pageCount= this.rows
+
+    var h = 100/this.rows
+   
+    for (var i = 0; i < this.pages.length; i++) {
+
+      var page = this.pages[i];
+      var top = h*i
+      page.styleWidth= `100%`
+      page.styleHeight= `${h}%`
+      page.styleTop=`${top}%`
+      console.log(page.styleHeight)
+
+
+
+    }
+     
+  }
+
+  onAllChangesDone() {
+    this.layoutPages();
+  }
+
+  addPage(page: Mdpage){
+    ListWrapper.push(this.pages, page);
+  }
+
+
+
+}
+
+
+@Directive({
+  selector: 'md-page',
+  properties: {
+    'pagerow': 'pagerow'
+  },
+  hostProperties: {
+    'styleHeight': 'style.height',
+    'styleWidth': 'style.width',
+    'styleTop': 'style.top'
+  },
+  lifecycle: [onChange]
+})
+
+export class Mdpage {
+  pageList: Md;
+  _rowspan: number;
+  
+  styleHeight: string;
+  styleWidth: string;
+  styleTop: string;
+  /*styleLeft: string;
+  styleMarginTop: string;
+  stylePaddingTop: string;
+  role: string;
+  */
+
+  isRegisteredWithPageList: boolean;
+
+  constructor(@Parent() pageList:Mdsence ){
+    this.gridList = pageList;
+
+    //this.role = 'listitem';
+
+    // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
+    this.pagerow = 1;
+  }
+
+  set pagerow(value) {
+    this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
+  }
+
+  get pagerow() {
+    return this._rowspan;
+  }
+  onChange(_) {
+    //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
+    if (!this.isRegisteredWithGridList) {
+      this.gridList.addPage(this);
+      this.isRegisteredWithGridList = true;
+    }
+  }
+
+}
+
+
+
+//mdpage
+@Component({
+  selector: 'md-page',
+  properties: {
+    'pagerow': 'pagerow'
+  },
+  hostProperties: {
+    'styleHeight': 'style.height',
+    'styleWidth': 'style.width',
+    'styleTop': 'style.top'
+  },
+  lifecycle: [onChange]
+})
+@View({
+  template: ``
+})
+export class Md1page {
+  pageList: Md;
+  _rowspan: number;
+  
+  styleHeight: string;
+  styleWidth: string;
+  styleTop: string;
+  /*styleLeft: string;
+  styleMarginTop: string;
+  stylePaddingTop: string;
+  role: string;
+  */
+
+  isRegisteredWithPageList: boolean;
+
+  constructor(@Parent() pageList:Mdsence ){
+    this.gridList = pageList;
+
+    //this.role = 'listitem';
+
+    // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
+    this.pagerow = 1;
+  }
+
+  set pagerow(value) {
+    this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
+  }
+
+  get pagerow() {
+    return this._rowspan;
+  }
+
+
+  /**
+   * Change handler invoked when bindings are resolved or when bindings have changed.
+   * Notifies grid-list that a re-layout is required.
+   */
+  onChange(_) {
+    //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
+    if (!this.isRegisteredWithGridList) {
+      this.gridList.addPage(this);
+      this.isRegisteredWithGridList = true;
+    }
+  }
+
+}
+
+
 
 @Injectable()
 class SettingService {

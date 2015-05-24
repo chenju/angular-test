@@ -1,0 +1,21 @@
+import {IHttpService, ILogService} from 'angular/angular2/somewhere';
+export class myController {
+  value;
+  constructor($log:ILogService, $http:IHttpService) {
+    this.value = 'Default Value';
+    this.httpService = $http;
+  }
+  activate() {
+    this.httpService.get().then(function(data){
+      this.value = data;
+    });
+  }
+  clickEvent(data) {
+    // Click event of any element.
+  }
+}
+
+<div ng-controller="myController as myCtrl">
+    <input type="text" ng-model="myCtrl.value">
+    <button ng-click="myCtrl.clickEvent()"></button>
+</div>

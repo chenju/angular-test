@@ -1,12 +1,27 @@
-System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadAsset"], function($__export) {
+System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadAsset", "angular2/src/core/annotations_impl/visibility", "angular2/src/facade/collection", "angular2/src/facade/math", "angular2/src/facade/lang", "angular2/src/core/annotations_impl/annotations"], function($__export) {
   "use strict";
   var Injectable,
       Component,
       View,
       bootstrap,
       If,
+      ElementRef,
+      onChange,
+      onAllChangesDone,
       loadAsset,
+      Parent,
+      ListWrapper,
+      Math,
+      StringWrapper,
+      isPresent,
+      isString,
+      NumberWrapper,
+      RegExpWrapper,
+      Directive,
       Main,
+      Mdsence,
+      Mdpage,
+      Md1page,
       SettingService,
       GreetingService;
   return {
@@ -17,21 +32,60 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       View = $__m.ViewAnnotation;
       bootstrap = $__m.bootstrap;
       If = $__m.If;
+      ElementRef = $__m.ElementRef;
+      onChange = $__m.onChange;
+      onAllChangesDone = $__m.onAllChangesDone;
     }, function($__m) {
       loadAsset = $__m.loadAsset;
+    }, function($__m) {
+      Parent = $__m.Parent;
+    }, function($__m) {
+      ListWrapper = $__m.ListWrapper;
+    }, function($__m) {
+      Math = $__m.Math;
+    }, function($__m) {
+      StringWrapper = $__m.StringWrapper;
+      isPresent = $__m.isPresent;
+      isString = $__m.isString;
+      NumberWrapper = $__m.NumberWrapper;
+      RegExpWrapper = $__m.RegExpWrapper;
+    }, function($__m) {
+      Directive = $__m.Directive;
     }],
     execute: function() {
       Main = (function() {
-        function Main(service) {
-          console.log(service.pageW);
+        function Main(set) {
+          this.senceWidth = set.pageW;
+          this.senceHeight = set.pageH;
+          this.pageCount = 1;
+          this.setSize();
         }
         return ($traceurRuntime.createClass)(Main, {
           init: function() {
             console.log('fuck');
           },
           onResize: function(event) {
-            console.log(event.target);
-            this.name = 1;
+            this.setSize();
+          },
+          set pageCount(value) {
+            this._pageCount = value;
+            this.setSize();
+          },
+          get pageCount() {
+            return this._pageCount;
+          },
+          setSize: function() {
+            var h = this.pageCount * document.documentElement.clientHeight;
+            this.senceHeight = (h + "px");
+            this.senceWidth = (document.documentElement.clientWidth + "px");
+          },
+          onChange: function(_) {
+            this.setSize();
+          },
+          transformForValue: function(value) {
+            var scale = value / 100;
+            var translateX = (value - 100) / 2;
+            return ("translateX(" + translateX + "%) scale(" + scale + ", 1)");
           }
         }, {});
       }());
@@ -40,14 +94,133 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [new Component({
             selector: 'myapp',
             injectables: [SettingService],
-            hostListeners: {'window:resize': 'onResize($event)'}
+            hostListeners: {'window:resize': 'onResize($event)'},
+            lifecycle: [onChange]
           }), new View({
-            template: "<loading></loading>\n               <wrapper *If=\"name==1\">AAA</wrapper>",
-            directives: [If, loadAsset]
+            templateUrl: 'demo.html',
+            directives: [loadAsset, Mdsence, Mdpage]
           })];
         }});
       Object.defineProperty(Main, "parameters", {get: function() {
           return [[SettingService]];
+        }});
+      Mdsence = (function() {
+        function Mdsence(m) {
+          this.pages = [];
+          this.rows = 0;
+          this.m = m;
+          console.log('md-sence');
+        }
+        return ($traceurRuntime.createClass)(Mdsence, {
+          set rowHeight(value) {
+            this.fixedRowHeight = value;
+          },
+          layoutPages: function() {
+            this.rows = this.pages.length;
+            this.m.pageCount = this.rows;
+            var h = 100 / this.rows;
+            for (var i = 0; i < this.pages.length; i++) {
+              var page = this.pages[i];
+              var top = h * i;
+              page.styleWidth = "100%";
+              page.styleHeight = (h + "%");
+              page.styleTop = (top + "%");
+              console.log(page.styleHeight);
+            }
+          },
+          onAllChangesDone: function() {
+            this.layoutPages();
+          },
+          addPage: function(page) {
+            ListWrapper.push(this.pages, page);
+          }
+        }, {});
+      }());
+      $__export("Mdsence", Mdsence);
+      Object.defineProperty(Mdsence, "annotations", {get: function() {
+          return [new Component({
+            selector: 'md-sence',
+            Properties: {'rowHeight': 'pageH'},
+            lifecycle: [onAllChangesDone]
+          }), new View({template: "<div class=\"md-grid-list\">\n  <content></content>\n</div>"})];
+        }});
+      Object.defineProperty(Mdsence, "parameters", {get: function() {
+          return [[Main]];
+        }});
+      Object.defineProperty(Mdsence.prototype.addPage, "parameters", {get: function() {
+          return [[Mdpage]];
+        }});
+      Mdpage = (function() {
+        function Mdpage(pageList) {
+          this.gridList = pageList;
+          this.pagerow = 1;
+        }
+        return ($traceurRuntime.createClass)(Mdpage, {
+          set pagerow(value) {
+            this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
+          },
+          get pagerow() {
+            return this._rowspan;
+          },
+          onChange: function(_) {
+            if (!this.isRegisteredWithGridList) {
+              this.gridList.addPage(this);
+              this.isRegisteredWithGridList = true;
+            }
+          }
+        }, {});
+      }());
+      $__export("Mdpage", Mdpage);
+      Object.defineProperty(Mdpage, "annotations", {get: function() {
+          return [new Directive({
+            selector: 'md-page',
+            properties: {'pagerow': 'pagerow'},
+            hostProperties: {
+              'styleHeight': 'style.height',
+              'styleWidth': 'style.width',
+              'styleTop': 'style.top'
+            },
+            lifecycle: [onChange]
+          })];
+        }});
+      Object.defineProperty(Mdpage, "parameters", {get: function() {
+          return [[Mdsence, new Parent()]];
+        }});
+      Md1page = (function() {
+        function Md1page(pageList) {
+          this.gridList = pageList;
+          this.pagerow = 1;
+        }
+        return ($traceurRuntime.createClass)(Md1page, {
+          set pagerow(value) {
+            this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
+          },
+          get pagerow() {
+            return this._rowspan;
+          },
+          onChange: function(_) {
+            if (!this.isRegisteredWithGridList) {
+              this.gridList.addPage(this);
+              this.isRegisteredWithGridList = true;
+            }
+          }
+        }, {});
+      }());
+      $__export("Md1page", Md1page);
+      Object.defineProperty(Md1page, "annotations", {get: function() {
+          return [new Component({
+            selector: 'md-page',
+            properties: {'pagerow': 'pagerow'},
+            hostProperties: {
+              'styleHeight': 'style.height',
+              'styleWidth': 'style.width',
+              'styleTop': 'style.top'
+            },
+            lifecycle: [onChange]
+          }), new View({template: ""})];
+        }});
+      Object.defineProperty(Md1page, "parameters", {get: function() {
+          return [[Mdsence, new Parent()]];
         }});
       SettingService = (function() {
         function SettingService() {

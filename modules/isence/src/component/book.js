@@ -1,74 +1,76 @@
-//preloading
-import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ViewContainerRef} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ElementRef} from 'angular2/angular2';
+//import {Parent} from 'angular2/src/core/annotations_impl/visibility';
 import {DOM} from 'angular2/src/dom/dom_adapter';
-import {Main} from 'main'
+//import {ListWrapper} from 'angular2/src/facade/collection';
+//import {StringWrapper, isPresent, isString, NumberWrapper, RegExpWrapper} from 'angular2/src/facade/lang';
+//import {Math} from 'angular2/src/facade/math';
+import {Directive} from 'angular2/src/core/annotations_impl/annotations';
 
-
+/*
 @Component({
     selector: 'wrapper'
+    
 })
-
 @View({
-    template: 'component/book.html',
-    directives: [If]
+    template:`<section></section>`,
+    directives:[Mdbookcontain]
+    
 })
 
 
-export class Book {
-    progress: number;
-    loaded: number=0;
-    t: number;
-    s: number = 60;
+export class Mdbook {
+    constructor(){
 
-    constructor(b:Main) {
-        this.progress = 0;
-        this.startload()
-        this.o(b)
-        this.visible = true;
+        console.log('fuck1')
     }
 
-    step(s: number) {
-        this.progress += s;
-    }
+}*/
+var _nextPageId=0
+@Directive({ selector: 'wrapper' })
+export class Mdbook{
+    _nextPageId:number;
 
-    startload() {
-        var src = ['img/arrow_down.png'];
-        this.t = src.length;
-        for (var i = 0; i < this.t; ++i) this.loadimg(src[i]);
+     constructor(){
 
-    }
-    loadimg(e: String) {
-        var r = new Image;
-        var self=this
-        r.onload = function() {
-                ++self.loaded
-                self.step(parseInt(self.loaded / self.t) * 100)
-            }
-        r.src = e
-    }
-
-    o(b:Main) {
-        
-        /*if( this.s >= 0){
-            this.s -= .5
-            if(this.loaded == this.t) {
-                //b.init()
-            }
-            else{
-                //this.o(b)
-                setTimeout(() => {this.o(b)},500)
-                //setTimeout(this.o(b), 500)
-            }
+        /*constructor(loader: DynamicComponentLoader) {
+          this.componentLoader = loader;
         }*/
-        0 >= this.s ? this.loaded / this.t > .5 ? (b.init(),this.hide()):(alert("加载图片失败，请返回刷新尝试!")): (this.s -= .5,this.loaded==this.t? (b.init(),this.hide()):setTimeout(() => {this.o(b)},500))
+        //this._nextPageId=0
+        var pageElement = this._createHostElement()
+        DOM.appendChild(DOM.query('wrapper'), pageElement)
+        DOM.addClass(pageElement,'md-page')
 
+
+
+
+     }
+
+  _createHostElement() {
+    var hostElement = DOM.createElement('md-page');
+    hostElement.id = `Mdbook${_nextPageId++}`;
+    return hostElement;
+  }
+
+
+}
+
+@Component({
+  selector: 'md-page'
+})
+@View({
+  template: `<md-page-hwrp><</md-page-hwrp>`
+  //directives: [MdDialogContent]
+})
+export class MdPage{
+    constructor(){
+
+       console.log('mdpage')
     }
-    hide(){
+}
 
-        
-        setTimeout(() => {this.visible=false},500)
-        //setTimeout(() => {DOM.setStyle(DOM.query('loading'),"display","none")},500)
-        
-    }
-
+@Directive({selector: 'md-page-hwrp'})
+class MdPageContent {
+  constructor(@Parent() page: Mdpage, elementRef: ElementRef) {
+    page.contentRef = elementRef;
+  }
 }
