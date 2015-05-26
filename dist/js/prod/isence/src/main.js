@@ -98,7 +98,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             lifecycle: [onChange]
           }), new View({
             templateUrl: 'demo.html',
-            directives: [loadAsset, Mdsence, Mdpage]
+            directives: []
           })];
         }});
       Object.defineProperty(Main, "parameters", {get: function() {
@@ -109,23 +109,19 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.pages = [];
           this.rows = 0;
           this.m = m;
-          console.log('md-sence');
         }
         return ($traceurRuntime.createClass)(Mdsence, {
-          set rowHeight(value) {
-            this.fixedRowHeight = value;
-          },
           layoutPages: function() {
-            this.rows = this.pages.length;
-            this.m.pageCount = this.rows;
-            var h = 100 / this.rows;
+            var p = this.pages.length;
+            this.m.pageCount = p;
+            var h = 100 / p;
+            console.log(h);
             for (var i = 0; i < this.pages.length; i++) {
               var page = this.pages[i];
               var top = h * i;
               page.styleWidth = "100%";
               page.styleHeight = (h + "%");
               page.styleTop = (top + "%");
-              console.log(page.styleHeight);
             }
           },
           onAllChangesDone: function() {
@@ -138,11 +134,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       }());
       $__export("Mdsence", Mdsence);
       Object.defineProperty(Mdsence, "annotations", {get: function() {
-          return [new Component({
+          return [new Directive({
             selector: 'md-sence',
-            Properties: {'rowHeight': 'pageH'},
             lifecycle: [onAllChangesDone]
-          }), new View({template: "<div class=\"md-grid-list\">\n  <content></content>\n</div>"})];
+          })];
         }});
       Object.defineProperty(Mdsence, "parameters", {get: function() {
           return [[Main]];
@@ -153,6 +148,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Mdpage = (function() {
         function Mdpage(pageList) {
           this.gridList = pageList;
+          this.layout = 'auto';
           this.pagerow = 1;
         }
         return ($traceurRuntime.createClass)(Mdpage, {
@@ -161,6 +157,12 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           get pagerow() {
             return this._rowspan;
+          },
+          set layout(value) {
+            this._layout = value;
+          },
+          get layout() {
+            return this._layout;
           },
           onChange: function(_) {
             if (!this.isRegisteredWithGridList) {
@@ -174,7 +176,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Object.defineProperty(Mdpage, "annotations", {get: function() {
           return [new Directive({
             selector: 'md-page',
-            properties: {'pagerow': 'pagerow'},
+            properties: {
+              'pagerow': 'pagerow',
+              'layout': 'layout'
+            },
             hostProperties: {
               'styleHeight': 'style.height',
               'styleWidth': 'style.width',

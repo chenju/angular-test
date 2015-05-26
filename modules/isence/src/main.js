@@ -21,7 +21,7 @@ import {Directive} from 'angular2/src/core/annotations_impl/annotations';
 })
 @View({
     templateUrl:'demo.html',
-    directives: [loadAsset,Mdsence,Mdpage]
+    directives: []
     
 })
 export class Main {
@@ -87,19 +87,13 @@ export class Main {
 }
 
 
-@Component({
+
+
+@Directive({
     selector: 'md-sence',
-    Properties:{
-       'rowHeight': 'pageH'
-    },
     lifecycle: [onAllChangesDone]
 })
-@View({
-    template: `<div class="md-grid-list">
-  <content></content>
-</div>`
-    
-})
+
 export class Mdsence {
    
    pages:List<Mdpage>;
@@ -113,22 +107,21 @@ export class Mdsence {
     this.pages = [];
     this.rows = 0;
     this.m=m
+
     
-    console.log('md-sence')
+    //console.log(sets)
   }
 
-  set rowHeight(value){
-    this.fixedRowHeight=value
-  }
 
   layoutPages() {
 
     //var tracker = new PageCoordinator(this.pages);
-    this.rows=this.pages.length
+    var p=this.pages.length
     
-    this.m.pageCount= this.rows
+    this.m.pageCount= p
 
-    var h = 100/this.rows
+    var h = 100/p
+    console.log(h)
    
     for (var i = 0; i < this.pages.length; i++) {
 
@@ -137,7 +130,8 @@ export class Mdsence {
       page.styleWidth= `100%`
       page.styleHeight= `${h}%`
       page.styleTop=`${top}%`
-      console.log(page.styleHeight)
+      
+      //this.layoutPage(@child sets:Query<Field>)
 
 
 
@@ -158,10 +152,12 @@ export class Mdsence {
 }
 
 
+
 @Directive({
   selector: 'md-page',
   properties: {
-    'pagerow': 'pagerow'
+    'pagerow': 'pagerow',
+    'layout' : 'layout'
   },
   hostProperties: {
     'styleHeight': 'style.height',
@@ -174,6 +170,7 @@ export class Mdsence {
 export class Mdpage {
   pageList: Md;
   _rowspan: number;
+  _layout:string;
   
   styleHeight: string;
   styleWidth: string;
@@ -186,9 +183,9 @@ export class Mdpage {
 
   isRegisteredWithPageList: boolean;
 
-  constructor(@Parent() pageList:Mdsence ){
+  constructor(@Parent() pageList:Mdsence){
     this.gridList = pageList;
-
+    this.layout='auto'
     //this.role = 'listitem';
 
     // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
@@ -197,12 +194,22 @@ export class Mdpage {
 
   set pagerow(value) {
     this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
+
   }
 
   get pagerow() {
     return this._rowspan;
   }
+
+  set layout(value){
+    this._layout=value
+  }
+
+  get layout(){
+    return this._layout
+  }
   onChange(_) {
+
     //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
     if (!this.isRegisteredWithGridList) {
       this.gridList.addPage(this);

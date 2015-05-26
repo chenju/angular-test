@@ -7,6 +7,17 @@
         position: absolute;
         background: white;
     }
+
+    md-page div{
+        position: absolute;
+    }
+
+    md-page .h_wrp{
+        height: 100%;
+        width:100%;
+        background: red
+
+    }
 </style>
 
 
@@ -15,18 +26,15 @@
 
 
 <loading></loading>
-<md-sence [style.height]='senceHeight' [style.width]='senceWidth' pageH="1004">
+<md-sence [style.height]='senceHeight' [style.width]='senceWidth'>
         <md-page pagerow="1" [style.height]='pageHeight' [style.width]='pageWidth' class="sec0">
         </md-page>
 
-        <md-page pagerow="2" class="sec1">
-            <div class="h_wrp">
-                <div delay="600" addClass="fadeInDown" class="start animated ">
-                	
-                </div>
+        <md-page pagerow="2" class="sec1" layout="auto">
+            <div class="h_wrp" >
+                <div w="100" h="100" bg="img/p1.png" x="100" y="100" delay="600" addClass="fadeInDown" class="start animated"></div>
                 <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>
                 <div delay="100" addClass="fadein fadeInUp" class="start animated" id="p1_btn_select"></div>
-                                          
             </div>
         </md-page>
         <md-page pagerow="3" class="sec2">
@@ -55,7 +63,7 @@
             </div>
         </md-page>
 
-        <md-page class="sec4">
+        <md-page pagerow="5" class="sec4">
             <div class="h_wrp">
                 <div delay="600" addClass="fadeInDown" class="start animated ">
                 	<i></i>
@@ -65,145 +73,6 @@
                 <div delay="100" addClass="fadein fadeInLeft" class="start animated"></div>
                 <div delay="100" addClass="fadein fadeInRight" class="start animated"></div>
                 <div delay="200" addClass="fadein fadeInLeft" class="start animated"></div>                          
-            </div>
-        </md-page>
-        <md-page class="sec5">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInLeft" class="start animated"></div>                          
-            </div>
-        </md-page>
-         <md-page class="sec6">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-
-         <md-page class="sec7">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-
-         <md-page class="sec8">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec9">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-         <md-page class="sec10">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec11">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-
-        <md-page class="sec12">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec13">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec14">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec15">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec16">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec17">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeInLeft" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInRight" class="start animated"></div>                        
-            </div>
-        </md-page>
-         <md-page class="sec18">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-         <md-page class="sec19">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-         <md-page class="sec20">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInRight" class="start animated"></div>                         
-            </div>
-        </md-page>
-         <md-page class="sec21">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec22">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInRight" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec23">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec24">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-        <md-page class="sec25">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>                         
-            </div>
-        </md-page>
-
-        <md-page class="sec26">
-            <div class="h_wrp">
-                <div delay="100" addClass="fadein fadeIn" class="start animated">
-                  <span id="p26-btn1" class="p26-btn"></span>
-                  <span id="p26-btn2" class="p26-btn"></span>
-                </div>
-
             </div>
         </md-page>
         
