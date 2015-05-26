@@ -56,7 +56,7 @@ System.register(["angular2/angular2", "Component/progress-circular/progress_circ
           },
           o: function(b) {
             var $__0 = this;
-            0 >= this.s ? this.loaded / this.t > .5 ? (b.init(), this.hide()) : (alert("加载图片失败，请返回刷新尝试!")) : (this.s -= .5, this.loaded == this.t ? (b.init(), this.hide()) : setTimeout((function() {
+            0 >= this.s ? this.loaded / this.t > .5 ? (this.hide()) : (alert("加载图片失败，请返回刷新尝试!")) : (this.s -= .5, this.loaded == this.t ? (this.hide()) : setTimeout((function() {
               $__0.o(b);
             }), 500));
           },

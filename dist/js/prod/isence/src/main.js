@@ -55,6 +55,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
     execute: function() {
       Main = (function() {
         function Main(set) {
+          this.set = set;
           this.senceWidth = set.pageW;
           this.senceHeight = set.pageH;
           this.pageCount = 1;
@@ -97,7 +98,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             hostListeners: {'window:resize': 'onResize($event)'}
           }), new View({
             templateUrl: 'demo.html',
-            directives: [Mdsence, ClassSet]
+            directives: [loadAsset, Mdsence, Mdpage]
           })];
         }});
       Object.defineProperty(Main, "parameters", {get: function() {
@@ -118,7 +119,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Mdsence = (function() {
         function Mdsence(m) {
           this.pages = [];
-          this.rows = 0;
           this.m = m;
         }
         return ($traceurRuntime.createClass)(Mdsence, {
@@ -126,7 +126,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             var p = this.pages.length;
             this.m.pageCount = p;
             var h = 100 / p;
-            console.log(h);
+            console.log(p);
             for (var i = 0; i < this.pages.length; i++) {
               var page = this.pages[i];
               var top = h * i;
@@ -145,7 +145,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       }());
       $__export("Mdsence", Mdsence);
       Object.defineProperty(Mdsence, "annotations", {get: function() {
-          return [new Directive({selector: 'md-sence'})];
+          return [new Directive({
+            selector: 'md-sence',
+            lifecycle: [onAllChangesDone]
+          })];
         }});
       Object.defineProperty(Mdsence, "parameters", {get: function() {
           return [[Main]];
@@ -155,7 +158,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         }});
       Mdpage = (function() {
         function Mdpage(pageList) {
-          this.gridList = pageList;
+          this.pageList = pageList;
           this.layout = 'auto';
           this.pagerow = 1;
         }
@@ -174,7 +177,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           onChange: function(_) {
             if (!this.isRegisteredWithGridList) {
-              this.gridList.addPage(this);
+              this.pageList.addPage(this);
               this.isRegisteredWithGridList = true;
             }
           }
@@ -202,10 +205,15 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       SettingService = (function() {
         function SettingService() {
           this.greeting = 'hello';
-          this.pageH = document.documentElement.clientHeight;
-          this.pageW = document.documentElement.clientWidth;
         }
-        return ($traceurRuntime.createClass)(SettingService, {}, {});
+        return ($traceurRuntime.createClass)(SettingService, {
+          get pageH() {
+            return document.documentElement.clientHeight;
+          },
+          get pageW() {
+            return document.documentElement.clientWidth;
+          }
+        }, {});
       }());
       Object.defineProperty(SettingService, "annotations", {get: function() {
           return [new Injectable()];

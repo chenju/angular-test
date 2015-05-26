@@ -62,7 +62,7 @@ export class loadAsset {
                 //setTimeout(this.o(b), 500)
             }
         }*/
-        0 >= this.s ? this.loaded / this.t > .5 ? (b.init(),this.hide()):(alert("加载图片失败，请返回刷新尝试!")): (this.s -= .5,this.loaded==this.t? (b.init(),this.hide()):setTimeout(() => {this.o(b)},500))
+        0 >= this.s ? this.loaded / this.t > .5 ? (this.hide()):(alert("加载图片失败，请返回刷新尝试!")): (this.s -= .5,this.loaded==this.t? (this.hide()):setTimeout(() => {this.o(b)},500))
 
     }
     hide(){

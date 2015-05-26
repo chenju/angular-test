@@ -20,17 +20,18 @@ import {Directive} from 'angular2/src/core/annotations_impl/annotations';
 })
 @View({
     templateUrl:'demo.html',
-    directives: [Mdsence,ClassSet]
+    directives: [loadAsset,Mdsence,Mdpage]
     
 })
 export class Main {
-    name:String;
+
     senceWidth:string;
     senceHeight:string;
     _pageCount:number;
-    greeting:string;
-    constructor(set:SettingService) {
+    set:SettingService;
 
+    constructor(set:SettingService) {
+       this.set=set
        this.senceWidth=set.pageW
        this.senceHeight=set.pageH
        this.pageCount=1
@@ -100,24 +101,19 @@ class ClassSet {
 
 @Directive({
     selector: 'md-sence',
-    //lifecycle: [onAllChangesDone],
-    //directives:[ClassSet]
+    lifecycle: [onAllChangesDone]
 })
 
 export class Mdsence {
    
    pages:List<Mdpage>;
-   rows: number;
-   fixedRowHeight:string;
    m:Main;
 
    
 
   constructor(m:Main){
     this.pages = [];
-    this.rows = 0;
     this.m=m
-
   }
 
 
@@ -129,7 +125,7 @@ export class Mdsence {
     this.m.pageCount= p
 
     var h = 100/p
-    console.log(h)
+    console.log(p)
    
     for (var i = 0; i < this.pages.length; i++) {
 
@@ -154,8 +150,6 @@ export class Mdsence {
   addPage(page: Mdpage){
     ListWrapper.push(this.pages, page);
   }
-
-
 
 }
 
@@ -192,7 +186,7 @@ export class Mdpage {
   isRegisteredWithPageList: boolean;
 
   constructor(@Parent() pageList:Mdsence){
-    this.gridList = pageList;
+    this.pageList = pageList;
     this.layout='auto'
     //this.role = 'listitem';
 
@@ -220,7 +214,7 @@ export class Mdpage {
 
     //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
     if (!this.isRegisteredWithGridList) {
-      this.gridList.addPage(this);
+      this.pageList.addPage(this);
       this.isRegisteredWithGridList = true;
     }
   }
@@ -236,12 +230,18 @@ export class Mdpage {
 @Injectable()
 class SettingService {
   greeting:string;
-  pageH:number;
-  pageW:number;
+  //pageH:number;
+  //pageW:number;
   constructor() {
     this.greeting = 'hello';
-    this.pageH = document.documentElement.clientHeight
-    this.pageW = document.documentElement.clientWidth
+    //this.pageH = document.documentElement.clientHeight
+    //this.pageW = document.documentElement.clientWidth
+  }
+  get pageH(){
+    return document.documentElement.clientHeight
+  }
+  get pageW(){
+    return document.documentElement.clientWidth
   }
 }
 
