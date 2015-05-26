@@ -15,13 +15,12 @@ import {Directive} from 'angular2/src/core/annotations_impl/annotations';
     
     hostListeners: {
     'window:resize': 'onResize($event)'
-    },
-    lifecycle: [onChange]
+    }
 
 })
 @View({
     templateUrl:'demo.html',
-    directives: []
+    directives: [Mdsence,ClassSet]
     
 })
 export class Main {
@@ -86,12 +85,23 @@ export class Main {
     
 }
 
+@Directive({
+  selector: '[layout]',
+  lifecycle: [onAllChangesDone]
+})
+class ClassSet {
+  onAllChangesDone() {
+    console.log('run')
+  }
+}
+
 
 
 
 @Directive({
     selector: 'md-sence',
-    lifecycle: [onAllChangesDone]
+    //lifecycle: [onAllChangesDone],
+    //directives:[ClassSet]
 })
 
 export class Mdsence {
@@ -108,8 +118,6 @@ export class Mdsence {
     this.rows = 0;
     this.m=m
 
-    
-    //console.log(sets)
   }
 
 
@@ -168,7 +176,7 @@ export class Mdsence {
 })
 
 export class Mdpage {
-  pageList: Md;
+  pageList: Mdsence;
   _rowspan: number;
   _layout:string;
   
@@ -221,68 +229,7 @@ export class Mdpage {
 
 
 
-//mdpage
-@Component({
-  selector: 'md-page',
-  properties: {
-    'pagerow': 'pagerow'
-  },
-  hostProperties: {
-    'styleHeight': 'style.height',
-    'styleWidth': 'style.width',
-    'styleTop': 'style.top'
-  },
-  lifecycle: [onChange]
-})
-@View({
-  template: ``
-})
-export class Md1page {
-  pageList: Md;
-  _rowspan: number;
-  
-  styleHeight: string;
-  styleWidth: string;
-  styleTop: string;
-  /*styleLeft: string;
-  styleMarginTop: string;
-  stylePaddingTop: string;
-  role: string;
-  */
 
-  isRegisteredWithPageList: boolean;
-
-  constructor(@Parent() pageList:Mdsence ){
-    this.gridList = pageList;
-
-    //this.role = 'listitem';
-
-    // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
-    this.pagerow = 1;
-  }
-
-  set pagerow(value) {
-    this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
-  }
-
-  get pagerow() {
-    return this._rowspan;
-  }
-
-
-  /**
-   * Change handler invoked when bindings are resolved or when bindings have changed.
-   * Notifies grid-list that a re-layout is required.
-   */
-  onChange(_) {
-    //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
-    if (!this.isRegisteredWithGridList) {
-      this.gridList.addPage(this);
-      this.isRegisteredWithGridList = true;
-    }
-  }
-
-}
 
 
 

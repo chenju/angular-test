@@ -19,9 +19,9 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       RegExpWrapper,
       Directive,
       Main,
+      ClassSet,
       Mdsence,
       Mdpage,
-      Md1page,
       SettingService,
       GreetingService;
   return {
@@ -94,15 +94,26 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [new Component({
             selector: 'myapp',
             injectables: [SettingService],
-            hostListeners: {'window:resize': 'onResize($event)'},
-            lifecycle: [onChange]
+            hostListeners: {'window:resize': 'onResize($event)'}
           }), new View({
             templateUrl: 'demo.html',
-            directives: []
+            directives: [Mdsence, ClassSet]
           })];
         }});
       Object.defineProperty(Main, "parameters", {get: function() {
           return [[SettingService]];
+        }});
+      ClassSet = (function() {
+        function ClassSet() {}
+        return ($traceurRuntime.createClass)(ClassSet, {onAllChangesDone: function() {
+            console.log('run');
+          }}, {});
+      }());
+      Object.defineProperty(ClassSet, "annotations", {get: function() {
+          return [new Directive({
+            selector: '[layout]',
+            lifecycle: [onAllChangesDone]
+          })];
         }});
       Mdsence = (function() {
         function Mdsence(m) {
@@ -134,10 +145,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       }());
       $__export("Mdsence", Mdsence);
       Object.defineProperty(Mdsence, "annotations", {get: function() {
-          return [new Directive({
-            selector: 'md-sence',
-            lifecycle: [onAllChangesDone]
-          })];
+          return [new Directive({selector: 'md-sence'})];
         }});
       Object.defineProperty(Mdsence, "parameters", {get: function() {
           return [[Main]];
@@ -189,42 +197,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           })];
         }});
       Object.defineProperty(Mdpage, "parameters", {get: function() {
-          return [[Mdsence, new Parent()]];
-        }});
-      Md1page = (function() {
-        function Md1page(pageList) {
-          this.gridList = pageList;
-          this.pagerow = 1;
-        }
-        return ($traceurRuntime.createClass)(Md1page, {
-          set pagerow(value) {
-            this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
-          },
-          get pagerow() {
-            return this._rowspan;
-          },
-          onChange: function(_) {
-            if (!this.isRegisteredWithGridList) {
-              this.gridList.addPage(this);
-              this.isRegisteredWithGridList = true;
-            }
-          }
-        }, {});
-      }());
-      $__export("Md1page", Md1page);
-      Object.defineProperty(Md1page, "annotations", {get: function() {
-          return [new Component({
-            selector: 'md-page',
-            properties: {'pagerow': 'pagerow'},
-            hostProperties: {
-              'styleHeight': 'style.height',
-              'styleWidth': 'style.width',
-              'styleTop': 'style.top'
-            },
-            lifecycle: [onChange]
-          }), new View({template: ""})];
-        }});
-      Object.defineProperty(Md1page, "parameters", {get: function() {
           return [[Mdsence, new Parent()]];
         }});
       SettingService = (function() {
