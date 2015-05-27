@@ -2,7 +2,7 @@
 import {Injectable} from 'angular2/src/di/annotations_impl';
 import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ElementRef,onChange, onAllChangesDone} from 'angular2/angular2';
 import {loadAsset} from 'loadAsset';
-import {Parent} from 'angular2/src/core/annotations_impl/visibility';
+import {Parent,Ancestor} from 'angular2/src/core/annotations_impl/visibility';
 import {ListWrapper} from 'angular2/src/facade/collection';
 import {Math} from 'angular2/src/facade/math';
 import {StringWrapper, isPresent, isString, NumberWrapper, RegExpWrapper} from 'angular2/src/facade/lang';
@@ -20,7 +20,7 @@ import {Directive} from 'angular2/src/core/annotations_impl/annotations';
 })
 @View({
     templateUrl:'demo.html',
-    directives: [loadAsset,Mdsence,Mdpage]
+    directives: [loadAsset,Mdsence,Mdpage,SetStyle]
     
 })
 export class Main {
@@ -187,7 +187,7 @@ export class Mdpage {
 
   constructor(@Parent() pageList:Mdsence){
     this.pageList = pageList;
-    this.layout='auto'
+    console.log(this.layout)
     //this.role = 'listitem';
 
     // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
@@ -203,13 +203,15 @@ export class Mdpage {
     return this._rowspan;
   }
 
-  set layout(value){
-    this._layout=value
+  set layout(v){
+    console.log(v)
+    this._layout=v
   }
 
   get layout(){
     return this._layout
   }
+
   onChange(_) {
 
     //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
@@ -217,6 +219,34 @@ export class Mdpage {
       this.pageList.addPage(this);
       this.isRegisteredWithGridList = true;
     }
+  }
+
+}
+
+@Directive({
+  selector: '[w]',
+  properties: {
+    'width': 'w'
+  },
+  hostProperties: {
+    'styleHeight': 'style.height',
+    'styleWidth': 'style.width',
+    'styleTop': 'style.top'
+  }
+})
+
+export class SetStyle{
+
+  styleHeight:string;
+  layout:string;
+
+  constructor(@Ancestor page:Mdpage){
+     
+      this.layout=page.layout
+  }
+  set width(value){
+    this.styleWidth=value
+    console.log(this.layout)
   }
 
 }
