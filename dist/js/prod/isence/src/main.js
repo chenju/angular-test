@@ -1,4 +1,4 @@
-System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadAsset", "angular2/src/core/annotations_impl/visibility", "angular2/src/facade/collection", "angular2/src/facade/math", "angular2/src/facade/lang", "angular2/src/core/annotations_impl/annotations"], function($__export) {
+System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadAsset", "angular2/src/core/annotations_impl/visibility", "angular2/src/facade/collection", "angular2/src/facade/math", "angular2/src/facade/lang", "angular2/src/core/annotations_impl/annotations", "angular2/src/core/annotations_impl/di"], function($__export) {
   "use strict";
   var Injectable,
       Component,
@@ -19,6 +19,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       NumberWrapper,
       RegExpWrapper,
       Directive,
+      Attribute,
       Main,
       ClassSet,
       Mdsence,
@@ -54,6 +55,8 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       RegExpWrapper = $__m.RegExpWrapper;
     }, function($__m) {
       Directive = $__m.Directive;
+    }, function($__m) {
+      Attribute = $__m.Attribute;
     }],
     execute: function() {
       Main = (function() {
@@ -160,9 +163,9 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [[Mdpage]];
         }});
       Mdpage = (function() {
-        function Mdpage(pageList) {
+        function Mdpage(pageList, layout) {
           this.pageList = pageList;
-          console.log(this.layout);
+          this.layout = layout;
           this.pagerow = 1;
         }
         return ($traceurRuntime.createClass)(Mdpage, {
@@ -204,7 +207,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           })];
         }});
       Object.defineProperty(Mdpage, "parameters", {get: function() {
-          return [[Mdsence, new Parent()]];
+          return [[Mdsence, new Parent()], [$traceurRuntime.type.string, new Attribute('layout')]];
         }});
       SetStyle = (function() {
         function SetStyle(page) {

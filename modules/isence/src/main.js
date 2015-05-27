@@ -7,6 +7,7 @@ import {ListWrapper} from 'angular2/src/facade/collection';
 import {Math} from 'angular2/src/facade/math';
 import {StringWrapper, isPresent, isString, NumberWrapper, RegExpWrapper} from 'angular2/src/facade/lang';
 import {Directive} from 'angular2/src/core/annotations_impl/annotations';
+import {Attribute} from 'angular2/src/core/annotations_impl/di';
 
 
 @Component({
@@ -185,9 +186,9 @@ export class Mdpage {
 
   isRegisteredWithPageList: boolean;
 
-  constructor(@Parent() pageList:Mdsence){
+  constructor(@Parent() pageList:Mdsence,@Attribute ('layout') layout:string){
     this.pageList = pageList;
-    console.log(this.layout)
+    this.layout=layout
     //this.role = 'listitem';
 
     // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
