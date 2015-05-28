@@ -28,6 +28,7 @@ export class Main {
 
     senceWidth:string;
     senceHeight:string;
+    aaa:string;
     _pageCount:number;
     set:SettingService;
 
@@ -37,6 +38,7 @@ export class Main {
        this.senceHeight=set.pageH
        this.pageCount=1
        this.setSize()
+       this.aaa="aaa"
 
       
     }
@@ -109,12 +111,14 @@ export class Mdsence {
    
    pages:List<Mdpage>;
    m:Main;
+   aaa:string;
 
    
 
   constructor(m:Main){
     this.pages = [];
     this.m=m
+    this.aaa="aaa"
   }
 
 
@@ -160,7 +164,10 @@ export class Mdsence {
   selector: 'md-page',
   properties: {
     'pagerow': 'pagerow',
-    'layout' : 'layout'
+    'layout1' : 'layout1',
+    'layout2': 'layout2',
+    'layout':'layout'
+
   },
   hostProperties: {
     'styleHeight': 'style.height',
@@ -174,6 +181,7 @@ export class Mdpage {
   pageList: Mdsence;
   _rowspan: number;
   _layout:string;
+  aaa:string;
   
   styleHeight: string;
   styleWidth: string;
@@ -188,7 +196,8 @@ export class Mdpage {
 
   constructor(@Parent() pageList:Mdsence,@Attribute ('layout') layout:string){
     this.pageList = pageList;
-    this.layout=layout
+    this.aaa ="aaa"
+    //this.layout=layout
     //this.role = 'listitem';
 
     // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
@@ -205,11 +214,17 @@ export class Mdpage {
   }
 
   set layout(v){
-    console.log(v)
+    console.log(v+"set")
     this._layout=v
   }
 
+
+  set layout1(v){
+    console.log(v+"b")
+  }
+
   get layout(){
+    console.log("get")
     return this._layout
   }
 
@@ -227,27 +242,37 @@ export class Mdpage {
 @Directive({
   selector: '[w]',
   properties: {
-    'width': 'w'
+    'widt': 'w'
   },
   hostProperties: {
     'styleHeight': 'style.height',
     'styleWidth': 'style.width',
     'styleTop': 'style.top'
-  }
+  },
+  lifecycle: [onChange]
 })
 
 export class SetStyle{
 
   styleHeight:string;
   layout:string;
+  page:Mdpage;
 
   constructor(@Ancestor page:Mdpage){
      
       this.layout=page.layout
+      this.page=page
+      console.log(this.layout)
+      console.log("???")
   }
-  set width(value){
+  set widt(value){
     this.styleWidth=value
+  }
+
+  onChange(_){
+    this.layout=this.page.layout
     console.log(this.layout)
+
   }
 
 }

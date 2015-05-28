@@ -66,6 +66,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.senceHeight = set.pageH;
           this.pageCount = 1;
           this.setSize();
+          this.aaa = "aaa";
         }
         return ($traceurRuntime.createClass)(Main, {
           init: function() {
@@ -126,6 +127,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         function Mdsence(m) {
           this.pages = [];
           this.m = m;
+          this.aaa = "aaa";
         }
         return ($traceurRuntime.createClass)(Mdsence, {
           layoutPages: function() {
@@ -165,7 +167,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Mdpage = (function() {
         function Mdpage(pageList, layout) {
           this.pageList = pageList;
-          this.layout = layout;
+          this.aaa = "aaa";
           this.pagerow = 1;
         }
         return ($traceurRuntime.createClass)(Mdpage, {
@@ -176,10 +178,14 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             return this._rowspan;
           },
           set layout(v) {
-            console.log(v);
+            console.log(v + "set");
             this._layout = v;
           },
+          set layout1(v) {
+            console.log(v + "b");
+          },
           get layout() {
+            console.log("get");
             return this._layout;
           },
           onChange: function(_) {
@@ -196,6 +202,8 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             selector: 'md-page',
             properties: {
               'pagerow': 'pagerow',
+              'layout1': 'layout1',
+              'layout2': 'layout2',
               'layout': 'layout'
             },
             hostProperties: {
@@ -212,22 +220,31 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       SetStyle = (function() {
         function SetStyle(page) {
           this.layout = page.layout;
+          this.page = page;
+          console.log(this.layout);
+          console.log("???");
         }
-        return ($traceurRuntime.createClass)(SetStyle, {set width(value) {
+        return ($traceurRuntime.createClass)(SetStyle, {
+          set widt(value) {
             this.styleWidth = value;
+          },
+          onChange: function(_) {
+            this.layout = this.page.layout;
             console.log(this.layout);
-          }}, {});
+          }
+        }, {});
       }());
       $__export("SetStyle", SetStyle);
       Object.defineProperty(SetStyle, "annotations", {get: function() {
           return [new Directive({
             selector: '[w]',
-            properties: {'width': 'w'},
+            properties: {'widt': 'w'},
             hostProperties: {
               'styleHeight': 'style.height',
               'styleWidth': 'style.width',
               'styleTop': 'style.top'
-            }
+            },
+            lifecycle: [onChange]
           })];
         }});
       Object.defineProperty(SetStyle, "parameters", {get: function() {
