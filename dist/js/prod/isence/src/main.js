@@ -21,7 +21,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Directive,
       Attribute,
       Main,
-      ClassSet,
       Mdsence,
       Mdpage,
       SetStyle,
@@ -66,11 +65,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.senceHeight = set.pageH;
           this.pageCount = 1;
           this.setSize();
-          this.aaa = "aaa";
         }
         return ($traceurRuntime.createClass)(Main, {
           init: function() {
-            console.log('fuck');
+            console.log('init');
           },
           onResize: function(event) {
             this.setSize();
@@ -89,11 +87,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           onChange: function(_) {
             this.setSize();
-          },
-          transformForValue: function(value) {
-            var scale = value / 100;
-            var translateX = (value - 100) / 2;
-            return ("translateX(" + translateX + "%) scale(" + scale + ", 1)");
           }
         }, {});
       }());
@@ -110,18 +103,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         }});
       Object.defineProperty(Main, "parameters", {get: function() {
           return [[SettingService]];
-        }});
-      ClassSet = (function() {
-        function ClassSet() {}
-        return ($traceurRuntime.createClass)(ClassSet, {onAllChangesDone: function() {
-            console.log('run');
-          }}, {});
-      }());
-      Object.defineProperty(ClassSet, "annotations", {get: function() {
-          return [new Directive({
-            selector: '[layout]',
-            lifecycle: [onAllChangesDone]
-          })];
         }});
       Mdsence = (function() {
         function Mdsence(m) {
@@ -167,7 +148,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Mdpage = (function() {
         function Mdpage(pageList, layout) {
           this.pageList = pageList;
-          this.aaa = "aaa";
           this.pagerow = 1;
         }
         return ($traceurRuntime.createClass)(Mdpage, {
@@ -176,17 +156,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           get pagerow() {
             return this._rowspan;
-          },
-          set layout(v) {
-            console.log(v + "set");
-            this._layout = v;
-          },
-          set layout1(v) {
-            console.log(v + "b");
-          },
-          get layout() {
-            console.log("get");
-            return this._layout;
           },
           onChange: function(_) {
             if (!this.isRegisteredWithGridList) {
@@ -202,8 +171,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             selector: 'md-page',
             properties: {
               'pagerow': 'pagerow',
-              'layout1': 'layout1',
-              'layout2': 'layout2',
               'layout': 'layout'
             },
             hostProperties: {
@@ -219,18 +186,19 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         }});
       SetStyle = (function() {
         function SetStyle(page) {
-          this.layout = page.layout;
           this.page = page;
-          console.log(this.layout);
-          console.log("???");
         }
         return ($traceurRuntime.createClass)(SetStyle, {
-          set widt(value) {
-            this.styleWidth = value;
-          },
+          onAllChangesDone: function() {},
           onChange: function(_) {
-            this.layout = this.page.layout;
-            console.log(this.layout);
+            var mode = this.page.layout;
+            if (mode == "abs") {} else {
+              this.styleHeight = this.styleHeight / 1008 * 1334 + 'px';
+              this.styleWidth = this.styleWidth / 640 * 750 + 'px';
+            }
+            if (this.backGround.indexOf("#") > 0) {
+              console.log(this.backGround);
+            }
           }
         }, {});
       }());
@@ -238,11 +206,18 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Object.defineProperty(SetStyle, "annotations", {get: function() {
           return [new Directive({
             selector: '[w]',
-            properties: {'widt': 'w'},
+            properties: {
+              'styleWidth': 'w',
+              'styleHeight': 'h',
+              'styleTop': 'top',
+              'styleLeft': 'left',
+              'backGround': 'img'
+            },
             hostProperties: {
               'styleHeight': 'style.height',
               'styleWidth': 'style.width',
-              'styleTop': 'style.top'
+              'styleTop': 'style.top',
+              'backGround': 'style.background'
             },
             lifecycle: [onChange]
           })];

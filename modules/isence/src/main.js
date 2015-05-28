@@ -28,7 +28,6 @@ export class Main {
 
     senceWidth:string;
     senceHeight:string;
-    aaa:string;
     _pageCount:number;
     set:SettingService;
 
@@ -38,19 +37,16 @@ export class Main {
        this.senceHeight=set.pageH
        this.pageCount=1
        this.setSize()
-       this.aaa="aaa"
 
       
     }
     init(){
       
-      console.log('fuck')
+      console.log('init')
     }
 
     onResize(event) {
 
-       
-       //this.senceHeight=`${this.width}px`
        this.setSize()
        
     }
@@ -79,27 +75,8 @@ export class Main {
        this.setSize()
 
     }
-
-    transformForValue(value) {
-    // TODO(jelbourn): test perf gain of caching these, since there are only 101 values.
-    var scale = value / 100;
-    var translateX = (value - 100) / 2;
-    return `translateX(${translateX}%) scale(${scale}, 1)`;
-  }
     
 }
-
-@Directive({
-  selector: '[layout]',
-  lifecycle: [onAllChangesDone]
-})
-class ClassSet {
-  onAllChangesDone() {
-    console.log('run')
-  }
-}
-
-
 
 
 @Directive({
@@ -140,9 +117,6 @@ export class Mdsence {
       page.styleHeight= `${h}%`
       page.styleTop=`${top}%`
       
-      //this.layoutPage(@child sets:Query<Field>)
-
-
 
     }
      
@@ -164,8 +138,6 @@ export class Mdsence {
   selector: 'md-page',
   properties: {
     'pagerow': 'pagerow',
-    'layout1' : 'layout1',
-    'layout2': 'layout2',
     'layout':'layout'
 
   },
@@ -181,7 +153,6 @@ export class Mdpage {
   pageList: Mdsence;
   _rowspan: number;
   _layout:string;
-  aaa:string;
   
   styleHeight: string;
   styleWidth: string;
@@ -196,11 +167,8 @@ export class Mdpage {
 
   constructor(@Parent() pageList:Mdsence,@Attribute ('layout') layout:string){
     this.pageList = pageList;
-    this.aaa ="aaa"
     //this.layout=layout
     //this.role = 'listitem';
-
-    // Tiles default to 1x1, but rowspan and colspan can be changed via binding.
     this.pagerow = 1;
   }
 
@@ -213,21 +181,16 @@ export class Mdpage {
     return this._rowspan;
   }
 
+  /*
   set layout(v){
-    console.log(v+"set")
     this._layout=v
   }
 
 
-  set layout1(v){
-    console.log(v+"b")
-  }
-
   get layout(){
-    console.log("get")
     return this._layout
   }
-
+  */
   onChange(_) {
 
     //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
@@ -242,39 +205,59 @@ export class Mdpage {
 @Directive({
   selector: '[w]',
   properties: {
-    'widt': 'w'
+    'styleWidth': 'w',
+    'styleHeight':'h',
+    'styleTop':'top',
+    'styleLeft':'left',
+    'backGround':'img'
   },
   hostProperties: {
     'styleHeight': 'style.height',
     'styleWidth': 'style.width',
-    'styleTop': 'style.top'
+    'styleTop': 'style.top',
+    'backGround':'style.background'
   },
-  lifecycle: [onChange]
+  lifecycle:[onChange]
 })
 
 export class SetStyle{
 
+  
   styleHeight:string;
-  layout:string;
   page:Mdpage;
 
   constructor(@Ancestor page:Mdpage){
      
-      this.layout=page.layout
       this.page=page
-      console.log(this.layout)
-      console.log("???")
   }
-  set widt(value){
-    this.styleWidth=value
+ 
+
+  onAllChangesDone(){
+       
+       //console.log(this.width)
+
+
   }
 
   onChange(_){
-    this.layout=this.page.layout
-    console.log(this.layout)
+    
+    var mode = this.page.layout;
+    if(mode =="abs"){
+       //this.styleHeight=this.styleHeight/1008*100+'%'
+       //this.styleWidth=this.styleWidth/640*100+'%'
 
+    }
+    else{
+
+       this.styleHeight=this.styleHeight/1008*1334+'px'
+       this.styleWidth=this.styleWidth/640*750+'px'
+       
+    }
+
+    if (this.backGround.indexOf("#")>0) {
+      console.log(this.backGround)
+    }
   }
-
 }
 
 
