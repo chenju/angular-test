@@ -21,6 +21,8 @@
 
     md-page div{
         position: absolute;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
     }
 
     md-page .h_wrp{
@@ -43,14 +45,14 @@
 
         <md-page pagerow="2" class="sec1" layout="auto">
             <div class="h_wrp" >
-                <div w="100" h="100" bg="img/p1.png" x="100" y="100" delay="600" addClass="fadeInDown" class="start animated"></div>
+                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="600" addClass="fadeInDown" [class]="classMap"></div>
                 <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>
                 <div delay="100" addClass="fadein fadeInUp" class="start animated" id="p1_btn_select"></div>
             </div>
         </md-page>
-        <md-page pagerow="3" class="sec2" layout="abs">
+        <md-page pagerow="3" class="sec2" layout="auto">
             <div class="h_wrp">
-                <div w="100" h="100" bg="#000000" delay="600" addClass="fadeInDown" class="start animated ">
+                <div w="100" h="100" bg="#000000" top="100" left="100" delay="600" addClass="fadeInDown" class="start animated ">
                 	<i></i>
                 	<i></i>
                 </div>

@@ -20,12 +20,14 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       RegExpWrapper,
       Directive,
       Attribute,
+      isBlank,
       Main,
       Mdsence,
       Mdpage,
       SetStyle,
       SettingService,
-      GreetingService;
+      GreetingService,
+      pageDivStyle;
   return {
     setters: [function($__m) {
       Injectable = $__m.Injectable;
@@ -52,6 +54,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       isString = $__m.isString;
       NumberWrapper = $__m.NumberWrapper;
       RegExpWrapper = $__m.RegExpWrapper;
+      isBlank = $__m.isBlank;
     }, function($__m) {
       Directive = $__m.Directive;
     }, function($__m) {
@@ -185,19 +188,35 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [[Mdsence, new Parent()], [$traceurRuntime.type.string, new Attribute('layout')]];
         }});
       SetStyle = (function() {
-        function SetStyle(page) {
+        function SetStyle(page, set) {
           this.page = page;
+          this.set = set;
         }
         return ($traceurRuntime.createClass)(SetStyle, {
           onAllChangesDone: function() {},
+          init: function() {
+            this.addClass_ = this.addClass;
+          },
+          uninit: function() {},
           onChange: function(_) {
+            this.init();
             var mode = this.page.layout;
             if (mode == "abs") {} else {
-              this.styleHeight = this.styleHeight / 1008 * 1334 + 'px';
-              this.styleWidth = this.styleWidth / 640 * 750 + 'px';
+              var h = this.set.pageH,
+                  w = this.set.pageW,
+                  fh = 1008 / h,
+                  fw = 640 / w;
+              this.styleHeight = this.styleHeight / fh + 'px';
+              this.styleWidth = this.styleWidth / fh + 'px';
+              this.styleTop = this.styleTop / fh + 'px';
+              this.styleLeft = this.styleLeft / fh + 'px';
             }
-            if (this.backGround.indexOf("#") > 0) {
-              console.log(this.backGround);
+            if (!isBlank(this.background)) {
+              if (/^(http|file|\/\/)/gi.test(this.background) || /\.(svg|png|jpg|jpeg|gif|bmp)$/gi.test(this.background)) {
+                this.styleBackgroundImage = 'url(' + this.background + ')';
+              } else {
+                this.styleBackground = this.background;
+              }
             }
           }
         }, {});
@@ -211,19 +230,23 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               'styleHeight': 'h',
               'styleTop': 'top',
               'styleLeft': 'left',
-              'backGround': 'img'
+              'background': 'bg',
+              'addClass': "addClass"
             },
             hostProperties: {
               'styleHeight': 'style.height',
               'styleWidth': 'style.width',
               'styleTop': 'style.top',
-              'backGround': 'style.background'
+              'styleLeft': 'style.left',
+              'styleBackground': 'style.backgroundColor',
+              'styleBackgroundImage': 'style.backgroundImage',
+              'addClass_': 'classname'
             },
             lifecycle: [onChange]
           })];
         }});
       Object.defineProperty(SetStyle, "parameters", {get: function() {
-          return [[Mdpage, new Ancestor]];
+          return [[Mdpage, new Ancestor], [SettingService]];
         }});
       SettingService = (function() {
         function SettingService() {
@@ -250,6 +273,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Object.defineProperty(GreetingService, "annotations", {get: function() {
           return [new Injectable()];
         }});
+      pageDivStyle = (function() {
+        function pageDivStyle() {}
+        return ($traceurRuntime.createClass)(pageDivStyle, {}, {});
+      }());
       bootstrap(Main);
     }
   };

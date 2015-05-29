@@ -1,6 +1,6 @@
 
 import {Injectable} from 'angular2/src/di/annotations_impl';
-import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ElementRef,onChange, onAllChangesDone} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ElementRef,onChange, onAllChangesDone,CSSClass} from 'angular2/angular2';
 import {loadAsset} from 'loadAsset';
 import {Parent,Ancestor} from 'angular2/src/core/annotations_impl/visibility';
 import {ListWrapper} from 'angular2/src/facade/collection';
@@ -8,6 +8,7 @@ import {Math} from 'angular2/src/facade/math';
 import {StringWrapper, isPresent, isString, NumberWrapper, RegExpWrapper} from 'angular2/src/facade/lang';
 import {Directive} from 'angular2/src/core/annotations_impl/annotations';
 import {Attribute} from 'angular2/src/core/annotations_impl/di';
+import {isBlank} from 'angular2/src/facade/lang';
 
 
 @Component({
@@ -21,7 +22,7 @@ import {Attribute} from 'angular2/src/core/annotations_impl/di';
 })
 @View({
     templateUrl:'demo.html',
-    directives: [loadAsset,Mdsence,Mdpage,SetStyle]
+    directives: [loadAsset,Mdsence,Mdpage,SetStyle,CSSClass]
     
 })
 export class Main {
@@ -209,26 +210,32 @@ export class Mdpage {
     'styleHeight':'h',
     'styleTop':'top',
     'styleLeft':'left',
-    'backGround':'img'
+    'background':'bg',
+    'addClass':"addClass"
   },
   hostProperties: {
     'styleHeight': 'style.height',
     'styleWidth': 'style.width',
     'styleTop': 'style.top',
-    'backGround':'style.background'
+    'styleLeft':'style.left',
+    'styleBackground':'style.backgroundColor',
+    'styleBackgroundImage':'style.backgroundImage',
+    'addClass_':'classname'
   },
   lifecycle:[onChange]
 })
 
 export class SetStyle{
 
-  
   styleHeight:string;
   page:Mdpage;
+  set:SettingService;
+  styleBackground:string;
 
-  constructor(@Ancestor page:Mdpage){
+  constructor(@Ancestor page:Mdpage,set:SettingService){
      
       this.page=page
+      this.set=set
   }
  
 
@@ -239,7 +246,21 @@ export class SetStyle{
 
   }
 
+  init(){
+
+    this.addClass_ = this.addClass
+
+  }
+
+  uninit(){
+
+
+  }
+
+
   onChange(_){
+
+    this.init()
     
     var mode = this.page.layout;
     if(mode =="abs"){
@@ -249,16 +270,33 @@ export class SetStyle{
     }
     else{
 
-       this.styleHeight=this.styleHeight/1008*1334+'px'
-       this.styleWidth=this.styleWidth/640*750+'px'
+      var h = this.set.pageH,
+          w = this.set.pageW,
+          fh= 1008/h,
+          fw= 640/w
        
+       //不变形缩放
+       this.styleHeight=this.styleHeight/fh+'px'
+       this.styleWidth=this.styleWidth/fh+'px'
+       this.styleTop=this.styleTop/fh+'px'
+       this.styleLeft=this.styleLeft/fh+'px'
     }
+   
+   // console.log(this.backGround)
+   if(!isBlank(this.background)){
+      if (/^(http|file|\/\/)/gi.test( this.background ) || /\.(svg|png|jpg|jpeg|gif|bmp)$/gi.test( this.background )) {
+         this.styleBackgroundImage= 'url('+ this.background +')'
+      }
+      else{
+                this.styleBackground = this.background
+      }
 
-    if (this.backGround.indexOf("#")>0) {
-      console.log(this.backGround)
+
     }
   }
 }
+
+
 
 
 
@@ -290,6 +328,16 @@ class GreetingService {
   constructor() {
     this.greeting = 'hello';
   }
+}
+
+
+class pageDivStyle {
+  height: string;
+  width: string;
+  top: string;
+  left: string;
+  marginTop: string;
+  paddingTop: string;
 }
 
 
