@@ -56,12 +56,13 @@ System.register(["angular2/angular2", "Component/progress-circular/progress_circ
           },
           o: function(b) {
             var $__0 = this;
-            0 >= this.s ? this.loaded / this.t > .5 ? (this.hide()) : (alert("加载图片失败，请返回刷新尝试!")) : (this.s -= .5, this.loaded == this.t ? (this.hide()) : setTimeout((function() {
+            0 >= this.s ? this.loaded / this.t > .5 ? (this.hide(b)) : (alert("加载图片失败，请返回刷新尝试!")) : (this.s -= .5, this.loaded == this.t ? (this.hide(b)) : setTimeout((function() {
               $__0.o(b);
             }), 500));
           },
-          hide: function() {
+          hide: function(b) {
             var $__0 = this;
+            b.init();
             setTimeout((function() {
               $__0.visible = false;
             }), 500);
@@ -85,6 +86,9 @@ System.register(["angular2/angular2", "Component/progress-circular/progress_circ
           return [[String]];
         }});
       Object.defineProperty(loadAsset.prototype.o, "parameters", {get: function() {
+          return [[Main]];
+        }});
+      Object.defineProperty(loadAsset.prototype.hide, "parameters", {get: function() {
           return [[Main]];
         }});
     }

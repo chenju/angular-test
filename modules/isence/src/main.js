@@ -1,6 +1,6 @@
 
 import {Injectable} from 'angular2/src/di/annotations_impl';
-import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ElementRef,onChange, onAllChangesDone,CSSClass} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ElementRef,onChange, onAllChangesDone,CSSClass,EventEmitter} from 'angular2/angular2';
 import {loadAsset} from 'loadAsset';
 import {Parent,Ancestor} from 'angular2/src/core/annotations_impl/visibility';
 import {ListWrapper} from 'angular2/src/facade/collection';
@@ -9,20 +9,35 @@ import {StringWrapper, isPresent, isString, NumberWrapper, RegExpWrapper} from '
 import {Directive} from 'angular2/src/core/annotations_impl/annotations';
 import {Attribute} from 'angular2/src/core/annotations_impl/di';
 import {isBlank} from 'angular2/src/facade/lang';
+//import {KeyboardEvent} from 'angular2/src/facade/browser';
+//import {EventEmitter ,Emitter} from 'angular2/src/core/annotations/events'
 
+
+class Emitter {
+  listener; // we only support one
+  constructor() {
+    this.listener = null;
+  }
+  emit(data) {
+    if(this.listener){return this.listener(data)};
+  }
+}
 
 @Component({
     selector: 'myapp',
-    injectables:[SettingService],
+    injectables:[SettingService,GetTouch],
     
     hostListeners: {
-    'window:resize': 'onResize($event)'
+    'window:resize': 'onResize($event)',
+    '^touchstart':'down($event)',
+    "^mousedown":'down($event)',
+    "^(${GetTouch.touchend})":'touchend()'
     }
 
 })
 @View({
     templateUrl:'demo.html',
-    directives: [loadAsset,Mdsence,Mdpage,SetStyle,CSSClass]
+    directives: [loadAsset,Mdsence,Mdpage,SetStyle]
     
 })
 export class Main {
@@ -31,25 +46,42 @@ export class Main {
     senceHeight:string;
     _pageCount:number;
     set:SettingService;
+    play:Emitter;
 
-    constructor(set:SettingService) {
-       this.set=set
+    
+
+    constructor(set:SettingService,tc:GetTouch) {
+       //console.log(todoDivs)
+
+       this.set=set;
+       this.tc=tc
        this.senceWidth=set.pageW
        this.senceHeight=set.pageH
        this.pageCount=1
-       this.setSize()
+       this.setSize();
+       this.play=new Emitter()
+       document.body.addEventListener(this.tc.touchend, function(e) {
+       console.log(this.tc.TOUCH) })
 
       
     }
     init(){
-      
+      this.loadvisible= false
       console.log('init')
     }
 
     onResize(event) {
 
+       console.log(event)
        this.setSize()
        
+    }
+
+    down(event){
+      console.log(event)
+      this.tc.TOUCH='start'
+      console.log(this.tc.TOUCH)
+      console.log(this.tc.touchstart)
     }
 
     set pageCount(value){
@@ -60,6 +92,18 @@ export class Main {
     }
     get pageCount(){
       return this._pageCount
+    }
+
+    pageInit(n){
+
+      var n=0;
+      this.pages[n].init()
+      
+    }
+
+    pageUnInit(){
+       var n=0;
+       this.pages[n].uninit()
     }
 
 
@@ -82,33 +126,31 @@ export class Main {
 
 @Directive({
     selector: 'md-sence',
-    lifecycle: [onAllChangesDone]
+    lifecycle: [onAllChangesDone],
+    hostListeners: {
+      'mouseover': 'onMouseOver(event)',
+      'mousedown': 'onMouseDown(event)'
+    }
 })
 
 export class Mdsence {
    
-   pages:List<Mdpage>;
-   m:Main;
-   aaa:string;
-
-   
+  pages:List<Mdpage>;
+  m:Main;
 
   constructor(m:Main){
     this.pages = [];
     this.m=m
-    this.aaa="aaa"
   }
-
-
+  
   layoutPages() {
 
-    //var tracker = new PageCoordinator(this.pages);
     var p=this.pages.length
     
     this.m.pageCount= p
+    this.m.pages= this.pages
 
     var h = 100/p
-    console.log(p)
    
     for (var i = 0; i < this.pages.length; i++) {
 
@@ -121,6 +163,18 @@ export class Mdsence {
 
     }
      
+  }
+
+  onMouseMove(e){
+
+    console.log(e)
+
+  }
+
+  onMouseDown(e){
+
+    console.log(e)
+
   }
 
   onAllChangesDone() {
@@ -147,11 +201,16 @@ export class Mdsence {
     'styleWidth': 'style.width',
     'styleTop': 'style.top'
   },
+  hostListeners: {
+      'mouseover': 'onMouseOver(event)',
+      'mousedown': 'onMouseDown(event)'
+    },
   lifecycle: [onChange]
 })
 
 export class Mdpage {
   pageList: Mdsence;
+  divs:List<SetStyle>;
   _rowspan: number;
   _layout:string;
   
@@ -171,6 +230,7 @@ export class Mdpage {
     //this.layout=layout
     //this.role = 'listitem';
     this.pagerow = 1;
+    this.divs=[]
   }
 
   set pagerow(value) {
@@ -182,16 +242,28 @@ export class Mdpage {
     return this._rowspan;
   }
 
-  /*
-  set layout(v){
-    this._layout=v
+  init(){
+
+    for (var i = 0; i < this.divs.length; i++) {
+
+       this.divs[i].init()
+    }
+    
+    
   }
 
+  uninit(){
 
-  get layout(){
-    return this._layout
+    for (var i = 0; i < this.divs.length; i++) {
+
+       this.divs[i].uninit()
+    }
   }
-  */
+
+  addDiv(div: SetStyle){
+    ListWrapper.push(this.divs, div);
+  }
+
   onChange(_) {
 
     //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
@@ -211,7 +283,10 @@ export class Mdpage {
     'styleTop':'top',
     'styleLeft':'left',
     'background':'bg',
-    'addClass':"addClass"
+    'addClass':'addclass',
+    'delay':'delay',
+    'orgClass':'class',
+    'inited':'init'
   },
   hostProperties: {
     'styleHeight': 'style.height',
@@ -220,7 +295,7 @@ export class Mdpage {
     'styleLeft':'style.left',
     'styleBackground':'style.backgroundColor',
     'styleBackgroundImage':'style.backgroundImage',
-    'addClass_':'classname'
+    'ClassMap':'attr.class'
   },
   lifecycle:[onChange]
 })
@@ -231,6 +306,7 @@ export class SetStyle{
   page:Mdpage;
   set:SettingService;
   styleBackground:string;
+  isRegisteredWithGridList;
 
   constructor(@Ancestor page:Mdpage,set:SettingService){
      
@@ -246,22 +322,33 @@ export class SetStyle{
 
   }
 
+  getInit(){
+    console.log('aaaaa')
+    return this.page.init
+  }
+
   init(){
+    
+    var that=this
+    setTimeout(function() {
+    that.ClassMap = that.orgClass+' '+that.addClass
+    },this.delay)
 
-    this.addClass_ = this.addClass
-
+    console.log(this.addClass)
+    console.log(this.background)  
+    console.log(this.delay)  
   }
 
   uninit(){
 
+    this.ClassMap = this.orgClass
 
   }
 
 
   onChange(_){
-
-    this.init()
-    
+   
+    this.ClassMap=this.orgClass    
     var mode = this.page.layout;
     if(mode =="abs"){
        //this.styleHeight=this.styleHeight/1008*100+'%'
@@ -293,6 +380,11 @@ export class SetStyle{
 
 
     }
+
+    if (!this.isRegisteredWithGridList) {
+      this.page.addDiv(this);
+      this.isRegisteredWithGridList = true;
+    }
   }
 }
 
@@ -322,14 +414,46 @@ class SettingService {
   }
 }
 
+
+
 @Injectable()
-class GreetingService {
-  greeting:string;
+class GetTouch{
+  touchstart:string;
+  touchend:string;
+  touchmove:string;
+  TOUCH:string;
   constructor() {
-    this.greeting = 'hello';
+  //&& !$parent.closest('.navbar-nav').length
+  if (('ontouchstart' in document.createElement("div")) ){
+    this.touchstart = "touchstart",
+    this.touchend = "touchend",
+    this.touchmove = "touchmove";
+    console.log(this.touchstart)
+    
+  }
+  else{
+    this.touchstart = "mousedown";
+    this.touchend = "mouseup";
+    this.touchmove = "mousemove";
+  } 
+
+  this.TOUCH='stop'
+  var that=this
+
+  document.addEventListener(this.touchstart, function(e) {
+    that.TOUCH = "start"; 
+    console.log(that.TOUCH);
+    console.log(that.touchstart)
+    })
+  document.body.addEventListener(this.touchmove, function(e) {
+    this.TOUCH = "move"; })  
+  document.body.addEventListener(this.touchend, function(e) {
+    this.TOUCH = "stop"; })  
+  document.body.addEventListener('touchcancle', function(e) {
+    this.TOUCH = "stop"; }) 
+
   }
 }
-
 
 class pageDivStyle {
   height: string;

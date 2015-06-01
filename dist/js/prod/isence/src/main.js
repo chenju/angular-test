@@ -8,6 +8,8 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       ElementRef,
       onChange,
       onAllChangesDone,
+      CSSClass,
+      EventEmitter,
       loadAsset,
       Parent,
       Ancestor,
@@ -21,12 +23,13 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Directive,
       Attribute,
       isBlank,
+      Emitter,
       Main,
       Mdsence,
       Mdpage,
       SetStyle,
       SettingService,
-      GreetingService,
+      GetTouch,
       pageDivStyle;
   return {
     setters: [function($__m) {
@@ -39,6 +42,8 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       ElementRef = $__m.ElementRef;
       onChange = $__m.onChange;
       onAllChangesDone = $__m.onAllChangesDone;
+      CSSClass = $__m.CSSClass;
+      EventEmitter = $__m.EventEmitter;
     }, function($__m) {
       loadAsset = $__m.loadAsset;
     }, function($__m) {
@@ -61,20 +66,44 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Attribute = $__m.Attribute;
     }],
     execute: function() {
+      Emitter = (function() {
+        function Emitter() {
+          this.listener = null;
+        }
+        return ($traceurRuntime.createClass)(Emitter, {emit: function(data) {
+            if (this.listener) {
+              return this.listener(data);
+            }
+            ;
+          }}, {});
+      }());
       Main = (function() {
-        function Main(set) {
+        function Main(set, tc) {
           this.set = set;
+          this.tc = tc;
           this.senceWidth = set.pageW;
           this.senceHeight = set.pageH;
           this.pageCount = 1;
           this.setSize();
+          this.play = new Emitter();
+          document.body.addEventListener(this.tc.touchend, function(e) {
+            console.log(this.tc.TOUCH);
+          });
         }
         return ($traceurRuntime.createClass)(Main, {
           init: function() {
+            this.loadvisible = false;
             console.log('init');
           },
           onResize: function(event) {
+            console.log(event);
             this.setSize();
+          },
+          down: function(event) {
+            console.log(event);
+            this.tc.TOUCH = 'start';
+            console.log(this.tc.TOUCH);
+            console.log(this.tc.touchstart);
           },
           set pageCount(value) {
             this._pageCount = value;
@@ -82,6 +111,14 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           get pageCount() {
             return this._pageCount;
+          },
+          pageInit: function(n) {
+            var n = 0;
+            this.pages[n].init();
+          },
+          pageUnInit: function() {
+            var n = 0;
+            this.pages[n].uninit();
           },
           setSize: function() {
             var h = this.pageCount * document.documentElement.clientHeight;
@@ -97,28 +134,32 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Object.defineProperty(Main, "annotations", {get: function() {
           return [new Component({
             selector: 'myapp',
-            injectables: [SettingService],
-            hostListeners: {'window:resize': 'onResize($event)'}
+            injectables: [SettingService, GetTouch],
+            hostListeners: {
+              'window:resize': 'onResize($event)',
+              '^touchstart': 'down($event)',
+              "^mousedown": 'down($event)',
+              "^(${GetTouch.touchend})": 'touchend()'
+            }
           }), new View({
             templateUrl: 'demo.html',
             directives: [loadAsset, Mdsence, Mdpage, SetStyle]
           })];
         }});
       Object.defineProperty(Main, "parameters", {get: function() {
-          return [[SettingService]];
+          return [[SettingService], [GetTouch]];
         }});
       Mdsence = (function() {
         function Mdsence(m) {
           this.pages = [];
           this.m = m;
-          this.aaa = "aaa";
         }
         return ($traceurRuntime.createClass)(Mdsence, {
           layoutPages: function() {
             var p = this.pages.length;
             this.m.pageCount = p;
+            this.m.pages = this.pages;
             var h = 100 / p;
-            console.log(p);
             for (var i = 0; i < this.pages.length; i++) {
               var page = this.pages[i];
               var top = h * i;
@@ -126,6 +167,12 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               page.styleHeight = (h + "%");
               page.styleTop = (top + "%");
             }
+          },
+          onMouseMove: function(e) {
+            console.log(e);
+          },
+          onMouseDown: function(e) {
+            console.log(e);
           },
           onAllChangesDone: function() {
             this.layoutPages();
@@ -139,7 +186,11 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Object.defineProperty(Mdsence, "annotations", {get: function() {
           return [new Directive({
             selector: 'md-sence',
-            lifecycle: [onAllChangesDone]
+            lifecycle: [onAllChangesDone],
+            hostListeners: {
+              'mouseover': 'onMouseOver(event)',
+              'mousedown': 'onMouseDown(event)'
+            }
           })];
         }});
       Object.defineProperty(Mdsence, "parameters", {get: function() {
@@ -152,6 +203,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         function Mdpage(pageList, layout) {
           this.pageList = pageList;
           this.pagerow = 1;
+          this.divs = [];
         }
         return ($traceurRuntime.createClass)(Mdpage, {
           set pagerow(value) {
@@ -159,6 +211,19 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           get pagerow() {
             return this._rowspan;
+          },
+          init: function() {
+            for (var i = 0; i < this.divs.length; i++) {
+              this.divs[i].init();
+            }
+          },
+          uninit: function() {
+            for (var i = 0; i < this.divs.length; i++) {
+              this.divs[i].uninit();
+            }
+          },
+          addDiv: function(div) {
+            ListWrapper.push(this.divs, div);
           },
           onChange: function(_) {
             if (!this.isRegisteredWithGridList) {
@@ -181,11 +246,18 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               'styleWidth': 'style.width',
               'styleTop': 'style.top'
             },
+            hostListeners: {
+              'mouseover': 'onMouseOver(event)',
+              'mousedown': 'onMouseDown(event)'
+            },
             lifecycle: [onChange]
           })];
         }});
       Object.defineProperty(Mdpage, "parameters", {get: function() {
           return [[Mdsence, new Parent()], [$traceurRuntime.type.string, new Attribute('layout')]];
+        }});
+      Object.defineProperty(Mdpage.prototype.addDiv, "parameters", {get: function() {
+          return [[SetStyle]];
         }});
       SetStyle = (function() {
         function SetStyle(page, set) {
@@ -194,12 +266,24 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         }
         return ($traceurRuntime.createClass)(SetStyle, {
           onAllChangesDone: function() {},
-          init: function() {
-            this.addClass_ = this.addClass;
+          getInit: function() {
+            console.log('aaaaa');
+            return this.page.init;
           },
-          uninit: function() {},
+          init: function() {
+            var that = this;
+            setTimeout(function() {
+              that.ClassMap = that.orgClass + ' ' + that.addClass;
+            }, this.delay);
+            console.log(this.addClass);
+            console.log(this.background);
+            console.log(this.delay);
+          },
+          uninit: function() {
+            this.ClassMap = this.orgClass;
+          },
           onChange: function(_) {
-            this.init();
+            this.ClassMap = this.orgClass;
             var mode = this.page.layout;
             if (mode == "abs") {} else {
               var h = this.set.pageH,
@@ -218,6 +302,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
                 this.styleBackground = this.background;
               }
             }
+            if (!this.isRegisteredWithGridList) {
+              this.page.addDiv(this);
+              this.isRegisteredWithGridList = true;
+            }
           }
         }, {});
       }());
@@ -231,7 +319,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               'styleTop': 'top',
               'styleLeft': 'left',
               'background': 'bg',
-              'addClass': "addClass"
+              'addClass': 'addclass',
+              'delay': 'delay',
+              'orgClass': 'class',
+              'inited': 'init'
             },
             hostProperties: {
               'styleHeight': 'style.height',
@@ -240,7 +331,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               'styleLeft': 'style.left',
               'styleBackground': 'style.backgroundColor',
               'styleBackgroundImage': 'style.backgroundImage',
-              'addClass_': 'classname'
+              'ClassMap': 'attr.class'
             },
             lifecycle: [onChange]
           })];
@@ -264,13 +355,36 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       Object.defineProperty(SettingService, "annotations", {get: function() {
           return [new Injectable()];
         }});
-      GreetingService = (function() {
-        function GreetingService() {
-          this.greeting = 'hello';
+      GetTouch = (function() {
+        function GetTouch() {
+          if (('ontouchstart' in document.createElement("div"))) {
+            this.touchstart = "touchstart", this.touchend = "touchend", this.touchmove = "touchmove";
+            console.log(this.touchstart);
+          } else {
+            this.touchstart = "mousedown";
+            this.touchend = "mouseup";
+            this.touchmove = "mousemove";
+          }
+          this.TOUCH = 'stop';
+          var that = this;
+          document.addEventListener(this.touchstart, function(e) {
+            that.TOUCH = "start";
+            console.log(that.TOUCH);
+            console.log(that.touchstart);
+          });
+          document.body.addEventListener(this.touchmove, function(e) {
+            this.TOUCH = "move";
+          });
+          document.body.addEventListener(this.touchend, function(e) {
+            this.TOUCH = "stop";
+          });
+          document.body.addEventListener('touchcancle', function(e) {
+            this.TOUCH = "stop";
+          });
         }
-        return ($traceurRuntime.createClass)(GreetingService, {}, {});
+        return ($traceurRuntime.createClass)(GetTouch, {}, {});
       }());
-      Object.defineProperty(GreetingService, "annotations", {get: function() {
+      Object.defineProperty(GetTouch, "annotations", {get: function() {
           return [new Injectable()];
         }});
       pageDivStyle = (function() {

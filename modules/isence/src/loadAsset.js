@@ -8,6 +8,7 @@ import {Parent} from 'angular2/src/core/annotations_impl/visibility';
 
 @Component({
     selector: 'loading'
+
 })
 
 @View({
@@ -62,13 +63,13 @@ export class loadAsset {
                 //setTimeout(this.o(b), 500)
             }
         }*/
-        0 >= this.s ? this.loaded / this.t > .5 ? (this.hide()):(alert("加载图片失败，请返回刷新尝试!")): (this.s -= .5,this.loaded==this.t? (this.hide()):setTimeout(() => {this.o(b)},500))
+        0 >= this.s ? this.loaded / this.t > .5 ? (this.hide(b)):(alert("加载图片失败，请返回刷新尝试!")): (this.s -= .5,this.loaded==this.t? (this.hide(b)):setTimeout(() => {this.o(b)},500))
 
     }
-    hide(){
+    hide(b:Main){
 
-        
-        setTimeout(() => {this.visible=false},500)
+        b.init()        
+        setTimeout(() => {this.visible=false;},500)
         //setTimeout(() => {DOM.setStyle(DOM.query('loading'),"display","none")},500)
         
     }
