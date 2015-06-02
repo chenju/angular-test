@@ -28,10 +28,7 @@ class Emitter {
     injectables:[SettingService,GetTouch],
     
     hostListeners: {
-    'window:resize': 'onResize($event)',
-    '^touchstart':'down($event)',
-    "^mousedown":'down($event)',
-    "^(${GetTouch.touchend})":'touchend()'
+    'window:resize': 'onResize($event)'
     }
 
 })
@@ -60,8 +57,6 @@ export class Main {
        this.pageCount=1
        this.setSize();
        this.play=new Emitter()
-       document.body.addEventListener(this.tc.touchend, function(e) {
-       console.log(this.tc.TOUCH) })
 
       
     }
@@ -77,12 +72,6 @@ export class Main {
        
     }
 
-    down(event){
-      console.log(event)
-      this.tc.TOUCH='start'
-      console.log(this.tc.TOUCH)
-      console.log(this.tc.touchstart)
-    }
 
     set pageCount(value){
 
@@ -128,8 +117,9 @@ export class Main {
     selector: 'md-sence',
     lifecycle: [onAllChangesDone],
     hostListeners: {
-      'mouseover': 'onMouseOver(event)',
-      'mousedown': 'onMouseDown(event)'
+      '^touchstart': 'onTouchStart($event)',
+      '^touchmove': 'onTouchMove($event)',
+      '^touchend':'onTouchEnd($event)'
     }
 })
 
@@ -138,9 +128,10 @@ export class Mdsence {
   pages:List<Mdpage>;
   m:Main;
 
-  constructor(m:Main){
+  constructor(m:Main,el:ElementRef){
     this.pages = [];
     this.m=m
+    console.log(el)
   }
   
   layoutPages() {
@@ -165,16 +156,22 @@ export class Mdsence {
      
   }
 
-  onMouseMove(e){
+  onTouchStart(e){
+
+    e.preventDefault()
+    console.log(e)
+
+  }
+
+  onTouchMove(e){
 
     console.log(e)
 
   }
 
-  onMouseDown(e){
+  onTouchEnd(e){
 
     console.log(e)
-
   }
 
   onAllChangesDone() {
@@ -423,7 +420,7 @@ class GetTouch{
   touchmove:string;
   TOUCH:string;
   constructor() {
-  //&& !$parent.closest('.navbar-nav').length
+
   if (('ontouchstart' in document.createElement("div")) ){
     this.touchstart = "touchstart",
     this.touchend = "touchend",
@@ -442,15 +439,13 @@ class GetTouch{
 
   document.addEventListener(this.touchstart, function(e) {
     that.TOUCH = "start"; 
-    console.log(that.TOUCH);
-    console.log(that.touchstart)
     })
   document.body.addEventListener(this.touchmove, function(e) {
-    this.TOUCH = "move"; })  
+    that.TOUCH = "move"; })  
   document.body.addEventListener(this.touchend, function(e) {
-    this.TOUCH = "stop"; })  
+    that.TOUCH = "stop"; })  
   document.body.addEventListener('touchcancle', function(e) {
-    this.TOUCH = "stop"; }) 
+    that.TOUCH = "stop"; }) 
 
   }
 }

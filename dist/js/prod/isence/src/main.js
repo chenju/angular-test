@@ -86,9 +86,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.pageCount = 1;
           this.setSize();
           this.play = new Emitter();
-          document.body.addEventListener(this.tc.touchend, function(e) {
-            console.log(this.tc.TOUCH);
-          });
         }
         return ($traceurRuntime.createClass)(Main, {
           init: function() {
@@ -98,12 +95,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           onResize: function(event) {
             console.log(event);
             this.setSize();
-          },
-          down: function(event) {
-            console.log(event);
-            this.tc.TOUCH = 'start';
-            console.log(this.tc.TOUCH);
-            console.log(this.tc.touchstart);
           },
           set pageCount(value) {
             this._pageCount = value;
@@ -135,12 +126,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [new Component({
             selector: 'myapp',
             injectables: [SettingService, GetTouch],
-            hostListeners: {
-              'window:resize': 'onResize($event)',
-              '^touchstart': 'down($event)',
-              "^mousedown": 'down($event)',
-              "^(${GetTouch.touchend})": 'touchend()'
-            }
+            hostListeners: {'window:resize': 'onResize($event)'}
           }), new View({
             templateUrl: 'demo.html',
             directives: [loadAsset, Mdsence, Mdpage, SetStyle]
@@ -150,9 +136,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [[SettingService], [GetTouch]];
         }});
       Mdsence = (function() {
-        function Mdsence(m) {
+        function Mdsence(m, el) {
           this.pages = [];
           this.m = m;
+          console.log(el);
         }
         return ($traceurRuntime.createClass)(Mdsence, {
           layoutPages: function() {
@@ -168,10 +155,14 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               page.styleTop = (top + "%");
             }
           },
-          onMouseMove: function(e) {
+          onTouchStart: function(e) {
+            e.preventDefault();
             console.log(e);
           },
-          onMouseDown: function(e) {
+          onTouchMove: function(e) {
+            console.log(e);
+          },
+          onTouchEnd: function(e) {
             console.log(e);
           },
           onAllChangesDone: function() {
@@ -188,13 +179,14 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             selector: 'md-sence',
             lifecycle: [onAllChangesDone],
             hostListeners: {
-              'mouseover': 'onMouseOver(event)',
-              'mousedown': 'onMouseDown(event)'
+              '^touchstart': 'onTouchStart($event)',
+              '^touchmove': 'onTouchMove($event)',
+              '^touchend': 'onTouchEnd($event)'
             }
           })];
         }});
       Object.defineProperty(Mdsence, "parameters", {get: function() {
-          return [[Main]];
+          return [[Main], [ElementRef]];
         }});
       Object.defineProperty(Mdsence.prototype.addPage, "parameters", {get: function() {
           return [[Mdpage]];
@@ -369,17 +361,15 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           var that = this;
           document.addEventListener(this.touchstart, function(e) {
             that.TOUCH = "start";
-            console.log(that.TOUCH);
-            console.log(that.touchstart);
           });
           document.body.addEventListener(this.touchmove, function(e) {
-            this.TOUCH = "move";
+            that.TOUCH = "move";
           });
           document.body.addEventListener(this.touchend, function(e) {
-            this.TOUCH = "stop";
+            that.TOUCH = "stop";
           });
           document.body.addEventListener('touchcancle', function(e) {
-            this.TOUCH = "stop";
+            that.TOUCH = "stop";
           });
         }
         return ($traceurRuntime.createClass)(GetTouch, {}, {});
