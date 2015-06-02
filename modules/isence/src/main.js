@@ -125,13 +125,14 @@ export class Main {
 
 export class Mdsence {
    
+  position:string; 
   pages:List<Mdpage>;
   m:Main;
 
   constructor(m:Main,el:ElementRef){
     this.pages = [];
-    this.m=m
-    console.log(el)
+    this.m=m;
+    this.position=0;
   }
   
   layoutPages() {
@@ -159,6 +160,8 @@ export class Mdsence {
   onTouchStart(e){
 
     e.preventDefault()
+    //touch=start
+    //获取touch点击的初始值
     console.log(e)
 
   }
@@ -172,6 +175,7 @@ export class Mdsence {
   onTouchEnd(e){
 
     console.log(e)
+    
   }
 
   onAllChangesDone() {
