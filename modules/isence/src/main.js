@@ -120,7 +120,12 @@ export class Main {
       '^touchstart': 'onTouchStart($event)',
       '^touchmove': 'onTouchMove($event)',
       '^touchend':'onTouchEnd($event)'
-    }
+    },
+    hostProperties: {
+      'mainTransform':'style.transform'
+    },
+    injectables:[SettingService,GetTouch]
+
 })
 
 export class Mdsence {
@@ -128,11 +133,23 @@ export class Mdsence {
   position:string; 
   pages:List<Mdpage>;
   m:Main;
+  tc:GetTouch;
+  o_y:number;
+  c_y:number;
+  n:number;
+  r:number;
+  mainTransform:string;
 
-  constructor(m:Main,el:ElementRef){
+  constructor(m:Main,tc:GetTouch){
     this.pages = [];
     this.m=m;
     this.position=0;
+    this.o_y=0;
+    this.c_y=0;
+    this.tc=tc;
+    this.n=0;
+    this.r=0;
+
   }
   
   layoutPages() {
@@ -159,16 +176,30 @@ export class Mdsence {
 
   onTouchStart(e){
 
-    e.preventDefault()
-    //touch=start
-    //获取touch点击的初始值
-    console.log(e)
+    //console(this.tc)
+    this.r =this.mainTransform
+    this.tc.TOUCH="start"
+    var i = e.changedTouches;
 
+        if (!!i) {
+           var s = i[0];
+               this.c_y = s.pageY
+        }
+    e.preventDefault()    
   }
 
   onTouchMove(e){
 
-    console.log(e)
+    if ("start" != this.tc.TOUCH && "move" != this.tc.TOUCH) return;
+    e.preventDefault();
+
+    var s =  e.changedTouches;
+                    if (!!s) {
+                        var o = s[0];
+                        this.n = o.pageY - this.c_y;
+                        //this.r = this.r+this.n
+    this.mainTransform = this.transformForValue((this.r+this.n))  
+    }                  
 
   }
 
@@ -184,6 +215,11 @@ export class Mdsence {
 
   addPage(page: Mdpage){
     ListWrapper.push(this.pages, page);
+  }
+
+  transformForValue(value) {
+    var translate3d = value;
+    return `translate3d(0,${translate3d}px,0)`;
   }
 
 }
@@ -440,7 +476,7 @@ class GetTouch{
 
   this.TOUCH='stop'
   var that=this
-
+  /*
   document.addEventListener(this.touchstart, function(e) {
     that.TOUCH = "start"; 
     })
@@ -449,7 +485,7 @@ class GetTouch{
   document.body.addEventListener(this.touchend, function(e) {
     that.TOUCH = "stop"; })  
   document.body.addEventListener('touchcancle', function(e) {
-    that.TOUCH = "stop"; }) 
+    that.TOUCH = "stop"; }) */
 
   }
 }

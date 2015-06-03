@@ -136,10 +136,15 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [[SettingService], [GetTouch]];
         }});
       Mdsence = (function() {
-        function Mdsence(m, el) {
+        function Mdsence(m, tc) {
           this.pages = [];
           this.m = m;
-          console.log(el);
+          this.position = 0;
+          this.o_y = 0;
+          this.c_y = 0;
+          this.tc = tc;
+          this.n = 0;
+          this.r = 0;
         }
         return ($traceurRuntime.createClass)(Mdsence, {
           layoutPages: function() {
@@ -156,11 +161,25 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             }
           },
           onTouchStart: function(e) {
+            this.r = this.mainTransform;
+            this.tc.TOUCH = "start";
+            var i = e.changedTouches;
+            if (!!i) {
+              var s = i[0];
+              this.c_y = s.pageY;
+            }
             e.preventDefault();
-            console.log(e);
           },
           onTouchMove: function(e) {
-            console.log(e);
+            if ("start" != this.tc.TOUCH && "move" != this.tc.TOUCH)
+              return ;
+            e.preventDefault();
+            var s = e.changedTouches;
+            if (!!s) {
+              var o = s[0];
+              this.n = o.pageY - this.c_y;
+              this.mainTransform = this.transformForValue((this.r + this.n));
+            }
           },
           onTouchEnd: function(e) {
             console.log(e);
@@ -170,6 +189,10 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           addPage: function(page) {
             ListWrapper.push(this.pages, page);
+          },
+          transformForValue: function(value) {
+            var translate3d = value;
+            return ("translate3d(0," + translate3d + "px,0)");
           }
         }, {});
       }());
@@ -182,11 +205,13 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               '^touchstart': 'onTouchStart($event)',
               '^touchmove': 'onTouchMove($event)',
               '^touchend': 'onTouchEnd($event)'
-            }
+            },
+            hostProperties: {'mainTransform': 'style.transform'},
+            injectables: [SettingService, GetTouch]
           })];
         }});
       Object.defineProperty(Mdsence, "parameters", {get: function() {
-          return [[Main], [ElementRef]];
+          return [[Main], [GetTouch]];
         }});
       Object.defineProperty(Mdsence.prototype.addPage, "parameters", {get: function() {
           return [[Mdpage]];
@@ -359,18 +384,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           }
           this.TOUCH = 'stop';
           var that = this;
-          document.addEventListener(this.touchstart, function(e) {
-            that.TOUCH = "start";
-          });
-          document.body.addEventListener(this.touchmove, function(e) {
-            that.TOUCH = "move";
-          });
-          document.body.addEventListener(this.touchend, function(e) {
-            that.TOUCH = "stop";
-          });
-          document.body.addEventListener('touchcancle', function(e) {
-            that.TOUCH = "stop";
-          });
         }
         return ($traceurRuntime.createClass)(GetTouch, {}, {});
       }());
