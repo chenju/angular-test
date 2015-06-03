@@ -62,9 +62,9 @@ System.register(["angular2/angular2", "Component/progress-circular/progress_circ
           },
           hide: function(b) {
             var $__0 = this;
-            b.init();
             setTimeout((function() {
               $__0.visible = false;
+              b.init();
             }), 500);
           }
         }, {});

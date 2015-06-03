@@ -84,17 +84,22 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.senceWidth = set.pageW;
           this.senceHeight = set.pageH;
           this.pageCount = 1;
+          this.pagNum = 0;
+          this.loadvisible = true;
           this.setSize();
           this.play = new Emitter();
         }
         return ($traceurRuntime.createClass)(Main, {
           init: function() {
             this.loadvisible = false;
-            console.log('init');
+            this.pages[0].init();
           },
           onResize: function(event) {
             console.log(event);
             this.setSize();
+          },
+          gotoPage: function(t, n) {
+            console.log("fuck");
           },
           set pageCount(value) {
             this._pageCount = value;
@@ -145,13 +150,16 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.tc = tc;
           this.n = 0;
           this.r = 0;
+          this.mainTransform = 'translate3d(0,0,0)';
         }
         return ($traceurRuntime.createClass)(Mdsence, {
           layoutPages: function() {
             var p = this.pages.length;
             this.m.pageCount = p;
             this.m.pages = this.pages;
+            this.m.gotoPage = this.movePage;
             var h = 100 / p;
+            this.pageH = document.documentElement.clientHeight;
             for (var i = 0; i < this.pages.length; i++) {
               var page = this.pages[i];
               var top = h * i;
@@ -161,7 +169,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             }
           },
           onTouchStart: function(e) {
-            this.r = this.mainTransform;
+            this.r = parseInt(this.get_transform_value(this.mainTransform, 'translate3d', 1));
             this.tc.TOUCH = "start";
             var i = e.changedTouches;
             if (!!i) {
@@ -180,15 +188,62 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               this.n = o.pageY - this.c_y;
               this.mainTransform = this.transformForValue((this.r + this.n));
             }
+            this.tc.TOUCH = 'move';
           },
           onTouchEnd: function(e) {
-            console.log(e);
+            var $__0 = this;
+            var s = parseInt(this.get_transform_value(this.mainTransform, 'translate3d', 1)) || this.r,
+                o = s - this.r,
+                f = this.m.pagNum;
+            if ("start" == this.tc.TOUCH && o != 0)
+              return ;
+            if (Math.abs(o) > 80) {
+              o > 0 && this.r < 0 ? f = this.m.pagNum - 1 : o < 0 && Math.abs(this.r - this.pageH) < parseInt(this.m.senceHeight) && (f = this.m.pagNum + 1), console.log(this.m.senceHeight + "fuck1"), console.log(f + "fuck"), this.movePage(this.m.pagNum, f);
+              return ;
+            }
+            if (0 == o)
+              return ;
+            this.transition = "top .2s linear";
+            this.mainTransform = this.transformForValue(parseInt(-this.m.pagNum * this.pageH));
+            setTimeout((function() {
+              $__0.transition = "";
+            }), 500);
+          },
+          movePage: function(t, n, r) {
+            var $__0 = this;
+            console.log('fuck');
+            var s = r ? "" : "keep",
+                o = r ? 0 : 600;
+            this.transition = "transform .4s linear";
+            this.mainTransform = this.transformForValue(parseInt(-n * this.pageH));
+            setTimeout((function() {
+              t != n && ($__0.pages[n] && $__0.pages[n].init(), $__0.pages[t] && $__0.pages[t].uninit()), $__0.transition = "", $__0.m.pagNum = n;
+            }), 500);
           },
           onAllChangesDone: function() {
             this.layoutPages();
           },
           addPage: function(page) {
             ListWrapper.push(this.pages, page);
+          },
+          get_transform_value: function(e, t) {
+            t = t.replace(/\-/g, "\\-");
+            var n = [0];
+            if (arguments.length > 2)
+              for (var r = 2; r < arguments.length; ++r)
+                n[r - 2] = arguments[r];
+            if ("none" == e || "" == e)
+              return null;
+            var i = new RegExp(t + "\\(([^\\)]+)\\)", "ig"),
+                s = e.match(i),
+                o = [],
+                u = [];
+            if (s && s.length > 0) {
+              s = s[0], o = s.replace(i, "$1").split(",");
+              for (var r = 0; r < n.length; ++r)
+                u.push(o[n[r]]);
+            }
+            return u.length == 1 && (u = u[0]), u;
           },
           transformForValue: function(value) {
             var translate3d = value;
@@ -206,7 +261,11 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               '^touchmove': 'onTouchMove($event)',
               '^touchend': 'onTouchEnd($event)'
             },
-            hostProperties: {'mainTransform': 'style.transform'},
+            hostProperties: {
+              'mainTransform': 'style.transform',
+              'transition': 'style.transition',
+              'ClassMap': 'attr.class'
+            },
             injectables: [SettingService, GetTouch]
           })];
         }});

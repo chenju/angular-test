@@ -42,19 +42,26 @@ export class Main {
     senceWidth:string;
     senceHeight:string;
     _pageCount:number;
+    pagNum:number;
+    pageAnmi:array;
     set:SettingService;
     play:Emitter;
+    keep:string;
+    gotoPage:function;
 
     
 
     constructor(set:SettingService,tc:GetTouch) {
        //console.log(todoDivs)
-
+ 
        this.set=set;
        this.tc=tc
        this.senceWidth=set.pageW
        this.senceHeight=set.pageH
        this.pageCount=1
+       this.pagNum=0
+       this.loadvisible= true
+       //this.pageAnmi[0]=this.anmi(0);
        this.setSize();
        this.play=new Emitter()
 
@@ -62,7 +69,7 @@ export class Main {
     }
     init(){
       this.loadvisible= false
-      console.log('init')
+      this.pages[0].init()
     }
 
     onResize(event) {
@@ -71,7 +78,30 @@ export class Main {
        this.setSize()
        
     }
+    
+    /*
+    anmi(n){
 
+      var p=function(){
+          this.pages[n].init()
+      }
+
+      var v=function(){
+         this.pages[n].uninit()
+      }
+
+      return{
+
+         init: p,
+         uninit: v
+
+      }
+
+    }
+
+    gotoPage(t,n){
+      console.log("fuck")
+    }*/
 
     set pageCount(value){
 
@@ -82,6 +112,7 @@ export class Main {
     get pageCount(){
       return this._pageCount
     }
+
 
     pageInit(n){
 
@@ -122,7 +153,9 @@ export class Main {
       '^touchend':'onTouchEnd($event)'
     },
     hostProperties: {
-      'mainTransform':'style.transform'
+      'mainTransform':'style.transform',
+      'transition':'style.transition',
+      'ClassMap':'attr.class'
     },
     injectables:[SettingService,GetTouch]
 
@@ -132,6 +165,7 @@ export class Mdsence {
    
   position:string; 
   pages:List<Mdpage>;
+  pageH:string;
   m:Main;
   tc:GetTouch;
   o_y:number;
@@ -139,6 +173,7 @@ export class Mdsence {
   n:number;
   r:number;
   mainTransform:string;
+  cssPrefix:string;
 
   constructor(m:Main,tc:GetTouch){
     this.pages = [];
@@ -149,6 +184,7 @@ export class Mdsence {
     this.tc=tc;
     this.n=0;
     this.r=0;
+    this.mainTransform='translate3d(0,0,0)';
 
   }
   
@@ -158,8 +194,12 @@ export class Mdsence {
     
     this.m.pageCount= p
     this.m.pages= this.pages
+    this.m.gotoPage =this.movePage
+
+    console.log(this.m.gotoPage)
 
     var h = 100/p
+    this.pageH = document.documentElement.clientHeight
    
     for (var i = 0; i < this.pages.length; i++) {
 
@@ -176,8 +216,7 @@ export class Mdsence {
 
   onTouchStart(e){
 
-    //console(this.tc)
-    this.r =this.mainTransform
+    this.r =parseInt(this.get_transform_value(this.mainTransform,'translate3d',1))
     this.tc.TOUCH="start"
     var i = e.changedTouches;
 
@@ -197,16 +236,39 @@ export class Mdsence {
                     if (!!s) {
                         var o = s[0];
                         this.n = o.pageY - this.c_y;
-                        //this.r = this.r+this.n
     this.mainTransform = this.transformForValue((this.r+this.n))  
-    }                  
+    }
+    this.tc.TOUCH='move'                  
 
   }
 
   onTouchEnd(e){
-
-    console.log(e)
+    var s= parseInt(this.get_transform_value(this.mainTransform,'translate3d',1)) || this.r,
+        o = s - this.r,
+        f = this.m.pagNum;  
+    if ("start" == this.tc.TOUCH && o != 0) return;
+    if (Math.abs(o) > 80) {
+                    o > 0 && this.r < 0 ? f = this.m.pagNum - 1 : o < 0 && Math.abs(this.r - this.pageH) < parseInt(this.m.senceHeight) && (f = this.m.pagNum + 1), console.log( this.m.senceHeight+"fuck1"), console.log(f+"fuck"), this.movePage(this.m.pagNum, f);
+                    return
+    }    
+    if (0 == o) return;
+    this.transition= "top .2s linear"
+    this.mainTransform = this.transformForValue(parseInt(-this.m.pagNum*this.pageH)) 
+    setTimeout(() => {this.transition= ""},500)
     
+  }
+
+  movePage(t,n,r){
+
+    var s = r ? "" : "keep",
+    o = r ? 0 : 600;
+    this.transition= "transform .4s linear"
+    this.mainTransform = this.transformForValue(parseInt(-n*this.pageH)) 
+    setTimeout(() => {
+      t != n && (this.pages[n]  && this.pages[n].init(), this.pages[t] && this.pages[t].uninit()),
+      this.transition= "",
+      this.m.pagNum=n},500)
+
   }
 
   onAllChangesDone() {
@@ -215,6 +277,25 @@ export class Mdsence {
 
   addPage(page: Mdpage){
     ListWrapper.push(this.pages, page);
+  }
+
+  get_transform_value(e, t) {
+        t = t.replace(/\-/g, "\\-");
+        var n = [0];
+        if (arguments.length > 2)
+            for (var r = 2; r < arguments.length; ++r) n[r - 2] = arguments[r];
+        if ("none" == e || "" == e) return null;
+        var i = new RegExp(t + "\\(([^\\)]+)\\)", "ig"),
+            s = e.match(i),
+            o = [],
+            u = [];
+        if (s && s.length > 0) {
+            s = s[0],
+                o = s.replace(i, "$1").split(",");
+            for (var r = 0; r < n.length; ++r) u.push(o[n[r]])
+        }
+        return u.length == 1 && (u = u[0]),
+            u
   }
 
   transformForValue(value) {

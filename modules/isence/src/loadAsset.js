@@ -68,8 +68,8 @@ export class loadAsset {
     }
     hide(b:Main){
 
-        b.init()        
-        setTimeout(() => {this.visible=false;},500)
+                
+        setTimeout(() => {this.visible=false;b.init()},500)
         //setTimeout(() => {DOM.setStyle(DOM.query('loading'),"display","none")},500)
         
     }

@@ -45,18 +45,14 @@
 
 
 <loading [hidden]="!loadvisible"></loading>
-<button (mouseover)="pageInit()">点我</button>
-<button (click)="pageUnInit()">点我</button>
-<md-sence [style.height]='senceHeight' [style.width]='senceWidth' (click)="pageInit()" >
+<md-sence [style.height]='senceHeight' [style.width]='senceWidth' >
         <md-page  [style.height]='pageHeight' [style.width]='pageWidth' class="sec1">
         </md-page>
 
         <md-page pagerow="2" class="sec1" layout="auto" init='false'>
             <div class="h_wrp" >
-                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated"></div>
+                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (touchstart)="gotoPage(0,2)"></div>
                 <div w="100" h="100" bg="img/fav1.png" top="300" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated"></div>
-                <div delay="300" addClass="fadein fadeInDown" class="start animated"></div>
-                <div delay="100" addClass="fadein fadeInUp" class="start animated" id="p1_btn_select"></div>
             </div>
         </md-page>
         <md-page pagerow="3" class="sec2" layout="auto">
@@ -64,11 +60,7 @@
                 <div w="100" h="100" bg="#000000" top="100" left="100" delay="600" addClass="fadeInDown" class="start animated ">
                 	<i></i>
                 	<i></i>
-                </div>
-                <div delay="300" addClass="fadein fadeInLeft" class="start animated"></div>
-                <div delay="100" addClass="fadein fadeInLeft" class="start animated"></div>
-                <div delay="100" addClass="fadein fadeInRight" class="start animated"></div>
-                <div delay="200" addClass="fadein fadeInLeft" class="start animated"></div>                          
+                </div>                         
             </div>
         </md-page>
 
