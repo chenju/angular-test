@@ -45,15 +45,12 @@ export class Main {
     pagNum:number;
     pageAnmi:array;
     set:SettingService;
-    play:Emitter;
-    keep:string;
-    gotoPage:function;
+    sence:Mdsence;
 
     
 
     constructor(set:SettingService,tc:GetTouch) {
-       //console.log(todoDivs)
- 
+
        this.set=set;
        this.tc=tc
        this.senceWidth=set.pageW
@@ -63,13 +60,12 @@ export class Main {
        this.loadvisible= true
        //this.pageAnmi[0]=this.anmi(0);
        this.setSize();
-       this.play=new Emitter()
 
       
     }
     init(){
       this.loadvisible= false
-      this.pages[0].init()
+      this.sence.pages[0].init()
     }
 
     onResize(event) {
@@ -135,9 +131,15 @@ export class Main {
 
     }
 
+    gotoPage(t,n,r){
+
+      this.sence.movePage(t,n,r)
+    }
+
     onChange(_){
 
        this.setSize()
+
 
     }
     
@@ -194,9 +196,9 @@ export class Mdsence {
     
     this.m.pageCount= p
     this.m.pages= this.pages
-    this.m.gotoPage =this.movePage
-
-    console.log(this.m.gotoPage)
+    this.m.sence= this
+    //this.m.gotoPage =this.movePage
+    //console.log(this.m.gotoPage)
 
     var h = 100/p
     this.pageH = document.documentElement.clientHeight
@@ -323,7 +325,7 @@ export class Mdsence {
       'mouseover': 'onMouseOver(event)',
       'mousedown': 'onMouseDown(event)'
     },
-  lifecycle: [onChange]
+  lifecycle: [onChange,onAllChangesDone]
 })
 
 export class Mdpage {
@@ -380,6 +382,11 @@ export class Mdpage {
 
   addDiv(div: SetStyle){
     ListWrapper.push(this.divs, div);
+
+  }
+
+  onAllChangesDone(){
+    //console.log('fuck')
   }
 
   onChange(_) {
@@ -407,10 +414,11 @@ export class Mdpage {
     'inited':'init'
   },
   hostProperties: {
-    'styleHeight': 'style.height',
-    'styleWidth': 'style.width',
-    'styleTop': 'style.top',
-    'styleLeft':'style.left',
+    'styleHeight_': 'style.height',
+    'styleWidth_': 'style.width',
+    'styleTop_': 'style.top',
+    'styleLeft_':'style.left',
+    'styleMarginTop':'style.marginTop',
     'styleBackground':'style.backgroundColor',
     'styleBackgroundImage':'style.backgroundImage',
     'ClassMap':'attr.class'
@@ -433,12 +441,7 @@ export class SetStyle{
   }
  
 
-  onAllChangesDone(){
-       
-       //console.log(this.width)
-
-
-  }
+  
 
   getInit(){
     console.log('aaaaa')
@@ -446,15 +449,12 @@ export class SetStyle{
   }
 
   init(){
-    
     var that=this
-    setTimeout(function() {
-    that.ClassMap = that.orgClass+' '+that.addClass
-    },this.delay)
-
-    console.log(this.addClass)
-    console.log(this.background)  
-    console.log(this.delay)  
+    if(!isBlank(that.addClass)){
+      setTimeout(function() {
+      that.ClassMap = that.orgClass+' '+that.addClass
+      },this.delay) 
+    }
   }
 
   uninit(){
@@ -463,11 +463,44 @@ export class SetStyle{
 
   }
 
-
   onChange(_){
+
+    console.log(this)
+
+    this.layout()
+
+  }
+
+  layout(){
    
     this.ClassMap=this.orgClass    
     var mode = this.page.layout;
+    console.log(this.styleTop)
+    var h = this.set.pageH,
+        w = this.set.pageW,
+        fh= 1008/h,
+        fw= 640/w,
+        oh=1008,
+        ow=640;
+
+    switch (mode){
+       
+       case("autoW"):
+       //this.styleMarginTop= ((-this.styleHeight)/2-(oh/2-this.styleTop))/fw+'px'
+
+       this.styleHeight_=this.styleHeight/fw+'px'
+       this.styleWidth_=this.styleWidth/fw+'px'
+       this.styleLeft_=this.styleLeft/fw+'px'
+
+       this.styleTop_=((h-oh)/2+this.styleTop)/fw+'px'
+       console.log(h)
+       break;
+
+    }
+   /*
+
+
+    
     if(mode =="abs"){
        //this.styleHeight=this.styleHeight/1008*100+'%'
        //this.styleWidth=this.styleWidth/640*100+'%'
@@ -481,11 +514,11 @@ export class SetStyle{
           fw= 640/w
        
        //不变形缩放
-       this.styleHeight=this.styleHeight/fh+'px'
-       this.styleWidth=this.styleWidth/fh+'px'
-       this.styleTop=this.styleTop/fh+'px'
-       this.styleLeft=this.styleLeft/fh+'px'
-    }
+       this.styleHeight=this.styleHeight/fw+'px'
+       this.styleWidth=this.styleWidth/fw+'px'
+       this.styleTop=this.styleTop/fw+'px'
+       this.styleLeft=this.styleLeft/fw+'px'
+    }*/
    
    // console.log(this.backGround)
    if(!isBlank(this.background)){

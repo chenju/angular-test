@@ -28,8 +28,15 @@
     md-page .h_wrp{
         height: 100%;
         width:100%;
-        background: red
+        background: red;
+        overflow: hidden;
 
+    }
+
+    md-page .text{
+        text-align: right;
+        font-size: 24px;
+        line-height: 3;
     }
     .start{
         opacity: 0
@@ -39,19 +46,32 @@
     }
 </style>
 
-
+<script type="text/javascript">
+    /* 排版模式
+       autoW: 按宽等比缩放,高度无法适应屏幕,中间元素自适应居中但不能超过想要适应的最小屏幕,850, 背景可设置成最大高度值,(top值也可以根据高度来变形,这样有助于当屏幕过长时填充两边空白,但有可能会使两个间距接近的层重叠.)
+       autoH: 按高度等比缩放, 宽度无法适应屏幕,中间元素自适应居中但不能超过想要适应的最小屏幕宽,背景可设置成最大宽度值(没用, 不做了)
+       auto: 按屏幕等比缩放, 会变形.
+       abs: 按实际设置绝对值不作自适应.
+    */
+</script>
 
 
 
 
 <loading [hidden]="!loadvisible"></loading>
 <md-sence [style.height]='senceHeight' [style.width]='senceWidth' >
-        <md-page  [style.height]='pageHeight' [style.width]='pageWidth' class="sec1">
+        <md-page  pagerow="1" class="sec0" layout="autoW">
+              <div class="h_wrp" >
+                <div w="640" h="1008" bg="img/p1_01.jpg" top="0" left="0" delay="100" addclass="fadein fadeIn" class="start animated"></div>
+                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (^touchend)="gotoPage(0,2)"><div w="450" h="100" class="text">gotoPage()点击跳转第三页</div></div>
+                <div w="100" h="100" bg="img/fav1.png" top="300" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated"></div>
+            </div>
         </md-page>
 
-        <md-page pagerow="2" class="sec1" layout="auto" init='false'>
+        <md-page pagerow="2" class="sec1" layout="auto">
             <div class="h_wrp" >
-                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (touchstart)="gotoPage(0,2)"></div>
+                <div w="640" h="1008" bg="img/p1_01.jpg" top="0" left="0" delay="100" addclass="fadein fadeIn" class="start animated"></div>
+                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (^touchend)="gotoPage(0,2)"><div w="450" h="100" class="text">gotoPage()点击跳转第三页</div></div>
                 <div w="100" h="100" bg="img/fav1.png" top="300" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated"></div>
             </div>
         </md-page>
@@ -89,9 +109,4 @@
                 <div delay="200" addClass="fadein fadeInLeft" class="start animated"></div>                          
             </div>
         </md-page>
-        
-        <div id="sharetip" class="start slip">
-            <div></div>
-            <div></div>
-        </div>
  </md-sence>       
