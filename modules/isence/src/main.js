@@ -70,7 +70,6 @@ export class Main {
 
     onResize(event) {
 
-       console.log(event)
        this.setSize()
        
     }
@@ -93,11 +92,8 @@ export class Main {
 
       }
 
-    }
-
-    gotoPage(t,n){
-      console.log("fuck")
     }*/
+
 
     set pageCount(value){
 
@@ -133,13 +129,33 @@ export class Main {
 
     gotoPage(t,n,r){
 
+      if("start"!=this.tc.TOUCH) return
       this.sence.movePage(t,n,r)
+    }
+
+    replay(n){
+        
+       if(isBlank(n)){
+         
+         this.sence.pages[this.pagNum].uninit()
+         this.sence.pages[this.pagNum].init()
+
+       }
+       else{
+       this.sence.pages[this.pagNum].divs[n].uninit()
+       this.sence.pages[this.pagNum].divs[n].init()
+       }
+    }
+
+    gotoUrl(url){
+      if("start"!=this.tc.TOUCH) return
+        location.href =url
+      e.preventDefault() 
     }
 
     onChange(_){
 
        this.setSize()
-
 
     }
     
@@ -167,7 +183,7 @@ export class Mdsence {
    
   position:string; 
   pages:List<Mdpage>;
-  pageH:string;
+  pageH:number;
   m:Main;
   tc:GetTouch;
   o_y:number;
@@ -177,7 +193,7 @@ export class Mdsence {
   mainTransform:string;
   cssPrefix:string;
 
-  constructor(m:Main,tc:GetTouch){
+  constructor(m:Main,tc:GetTouch,set:SettingService){
     this.pages = [];
     this.m=m;
     this.position=0;
@@ -186,6 +202,7 @@ export class Mdsence {
     this.tc=tc;
     this.n=0;
     this.r=0;
+    this.set=set;
     this.mainTransform='translate3d(0,0,0)';
 
   }
@@ -193,15 +210,11 @@ export class Mdsence {
   layoutPages() {
 
     var p=this.pages.length
-    
     this.m.pageCount= p
     this.m.pages= this.pages
     this.m.sence= this
-    //this.m.gotoPage =this.movePage
-    //console.log(this.m.gotoPage)
-
     var h = 100/p
-    this.pageH = document.documentElement.clientHeight
+    this.pageH = this.set.pageH
    
     for (var i = 0; i < this.pages.length; i++) {
 
@@ -211,9 +224,7 @@ export class Mdsence {
       page.styleHeight= `${h}%`
       page.styleTop=`${top}%`
       
-
     }
-     
   }
 
   onTouchStart(e){
@@ -240,7 +251,8 @@ export class Mdsence {
                         this.n = o.pageY - this.c_y;
     this.mainTransform = this.transformForValue((this.r+this.n))  
     }
-    this.tc.TOUCH='move'                  
+
+    if (Math.abs(this.n) > 5 ) this.tc.TOUCH='move'                  
 
   }
 
@@ -248,6 +260,7 @@ export class Mdsence {
     var s= parseInt(this.get_transform_value(this.mainTransform,'translate3d',1)) || this.r,
         o = s - this.r,
         f = this.m.pagNum;  
+
     if ("start" == this.tc.TOUCH && o != 0) return;
     if (Math.abs(o) > 80) {
                     o > 0 && this.r < 0 ? f = this.m.pagNum - 1 : o < 0 && Math.abs(this.r - this.pageH) < parseInt(this.m.senceHeight) && (f = this.m.pagNum + 1), console.log( this.m.senceHeight+"fuck1"), console.log(f+"fuck"), this.movePage(this.m.pagNum, f);
@@ -256,7 +269,7 @@ export class Mdsence {
     if (0 == o) return;
     this.transition= "top .2s linear"
     this.mainTransform = this.transformForValue(parseInt(-this.m.pagNum*this.pageH)) 
-    setTimeout(() => {this.transition= ""},500)
+    setTimeout(() => {this.transition= ""},200)
     
   }
 
@@ -321,18 +334,12 @@ export class Mdsence {
     'styleWidth': 'style.width',
     'styleTop': 'style.top'
   },
-  hostListeners: {
-      'mouseover': 'onMouseOver(event)',
-      'mousedown': 'onMouseDown(event)'
-    },
   lifecycle: [onChange,onAllChangesDone]
 })
 
 export class Mdpage {
   pageList: Mdsence;
   divs:List<SetStyle>;
-  _rowspan: number;
-  _layout:string;
   
   styleHeight: string;
   styleWidth: string;
@@ -347,12 +354,11 @@ export class Mdpage {
 
   constructor(@Parent() pageList:Mdsence,@Attribute ('layout') layout:string){
     this.pageList = pageList;
-    //this.layout=layout
-    //this.role = 'listitem';
     this.pagerow = 1;
     this.divs=[]
   }
-
+  
+  /*
   set pagerow(value) {
     this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
 
@@ -361,7 +367,7 @@ export class Mdpage {
   get pagerow() {
     return this._rowspan;
   }
-
+  */
   init(){
 
     for (var i = 0; i < this.divs.length; i++) {
@@ -392,9 +398,9 @@ export class Mdpage {
   onChange(_) {
 
     //console.log(`grid-tile on-change ${this.gridList.tiles.indexOf(this)}`);
-    if (!this.isRegisteredWithGridList) {
+    if (!this.isRegisteredWithPageList) {
       this.pageList.addPage(this);
-      this.isRegisteredWithGridList = true;
+      this.isRegisteredWithPageList = true;
     }
   }
 
@@ -411,13 +417,13 @@ export class Mdpage {
     'addClass':'addclass',
     'delay':'delay',
     'orgClass':'class',
-    'inited':'init'
+    'fix':'fix'
   },
   hostProperties: {
-    'styleHeight_': 'style.height',
-    'styleWidth_': 'style.width',
-    'styleTop_': 'style.top',
-    'styleLeft_':'style.left',
+    'styleHeight': 'style.height',
+    'styleWidth': 'style.width',
+    'styleTop': 'style.top',
+    'styleLeft':'style.left',
     'styleMarginTop':'style.marginTop',
     'styleBackground':'style.backgroundColor',
     'styleBackgroundImage':'style.backgroundImage',
@@ -432,7 +438,7 @@ export class SetStyle{
   page:Mdpage;
   set:SettingService;
   styleBackground:string;
-  isRegisteredWithGridList;
+  isRegisteredWithDivList:boolean;
 
   constructor(@Ancestor page:Mdpage,set:SettingService){
      
@@ -440,13 +446,6 @@ export class SetStyle{
       this.set=set
   }
  
-
-  
-
-  getInit(){
-    console.log('aaaaa')
-    return this.page.init
-  }
 
   init(){
     var that=this
@@ -464,18 +463,13 @@ export class SetStyle{
   }
 
   onChange(_){
-
-    console.log(this)
-
     this.layout()
-
   }
 
   layout(){
    
     this.ClassMap=this.orgClass    
     var mode = this.page.layout;
-    console.log(this.styleTop)
     var h = this.set.pageH,
         w = this.set.pageW,
         fh= 1008/h,
@@ -486,14 +480,39 @@ export class SetStyle{
     switch (mode){
        
        case("autoW"):
-       //this.styleMarginTop= ((-this.styleHeight)/2-(oh/2-this.styleTop))/fw+'px'
+       var fix=0;
+       if(this.fix) fix =parseInt(h-oh/fw)/2
 
-       this.styleHeight_=this.styleHeight/fw+'px'
-       this.styleWidth_=this.styleWidth/fw+'px'
-       this.styleLeft_=this.styleLeft/fw+'px'
+       this.styleHeight=this.styleHeight/fw+'px'
+       this.styleWidth=this.styleWidth/fw+'px'
+       
+       this.styleLeft=parseInt(this.styleLeft)/fw+'px'
+       this.styleTop=(fix+parseInt(this.styleTop)/fw)+'px'
+       break;
 
-       this.styleTop_=((h-oh)/2+this.styleTop)/fw+'px'
-       console.log(h)
+       case("autoH"):
+       var fix=0;
+       if(this.fix) fix =parseInt(w-ow/fh)/2
+
+       this.styleHeight=this.styleHeight/fh+'px'
+       this.styleWidth=this.styleWidth/fh+'px'
+       this.styleTop=this.styleTop/fh+'px'
+
+       this.styleLeft=(fix+parseInt(this.styleLeft)/fh)+'px'
+       break;
+
+       case("auto"):
+       
+       var fixX=0,
+           fixY=0;
+       if(this.fix) {fixX =parseInt(w-ow/fw)/2,
+                     fixY=parseInt(h-oh/fh)/2}
+
+       this.styleHeight=this.styleHeight/fh+'px'
+       this.styleWidth=this.styleWidth/fw+'px'
+       
+       this.styleTop=(fixY+parseInt(this.styleTop)/fh)+'px'
+       this.styleLeft=(fixX+parseInt(this.styleLeft)/fw)+'px'
        break;
 
     }
@@ -520,21 +539,20 @@ export class SetStyle{
        this.styleLeft=this.styleLeft/fw+'px'
     }*/
    
-   // console.log(this.backGround)
    if(!isBlank(this.background)){
       if (/^(http|file|\/\/)/gi.test( this.background ) || /\.(svg|png|jpg|jpeg|gif|bmp)$/gi.test( this.background )) {
          this.styleBackgroundImage= 'url('+ this.background +')'
       }
       else{
-                this.styleBackground = this.background
+         this.styleBackground = this.background
       }
 
 
     }
 
-    if (!this.isRegisteredWithGridList) {
+    if (!this.isRegisteredWithDivList) {
       this.page.addDiv(this);
-      this.isRegisteredWithGridList = true;
+      this.isRegisteredWithDivList = true;
     }
   }
 }
@@ -549,13 +567,8 @@ export class SetStyle{
 
 @Injectable()
 class SettingService {
-  greeting:string;
-  //pageH:number;
-  //pageW:number;
   constructor() {
-    this.greeting = 'hello';
-    //this.pageH = document.documentElement.clientHeight
-    //this.pageW = document.documentElement.clientWidth
+    
   }
   get pageH(){
     return document.documentElement.clientHeight

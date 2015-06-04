@@ -34,9 +34,8 @@
     }
 
     md-page .text{
-        text-align: right;
         font-size: 24px;
-        line-height: 3;
+        line-height: 4;
     }
     .start{
         opacity: 0
@@ -44,14 +43,76 @@
     .fadein{
         opacity: 1
     }
+
+    /*自定义动画*/
+    .up{
+    position:absolute;
+    display:block;
+    width:64px;
+    height:64px;
+    overflow:hidden;
+    background:url(img/arrow_down.png) 0 0px no-repeat;
+    background-size:100% 100%;
+    left:50%;
+    bottom:30px;
+    margin:0 0 0 -32px;
+    -webkit-animation:start 1.5s infinite ease-in-out;
+    -moz-animation:start 1.5s infinite ease-in-out;
+    -o-animation:start 1.5s infinite ease-in-out;
+    -ms-animation:start 1.5s infinite ease-in-out;
+    animation:start 1.5s infinite ease-in-out
+}
+
+    @keyframes start{
+    0%{
+        opacity:0;
+        transform:translate(0,10px)
+    }
+    50%{
+        opacity:1;
+        transform:translate(0,-5px)
+    }
+    100%{
+        opacity:0;
+        transform:translate(0,-15px)
+    }
+
+}
+
+   @-webkit-keyframes start{
+    0%{
+        opacity:0;
+        -webkit-transform:translate(0,10px)
+    }
+    50%{
+        opacity:1;
+        -webkit-transform:translate(0,-5px)
+    }
+    100%{
+        opacity:0;
+        -webkit-transform:translate(0,-15px)
+    }
+
+}
 </style>
 
 <script type="text/javascript">
     /* 排版模式
        autoW: 按宽等比缩放,高度无法适应屏幕,中间元素自适应居中但不能超过想要适应的最小屏幕,850, 背景可设置成最大高度值,(top值也可以根据高度来变形,这样有助于当屏幕过长时填充两边空白,但有可能会使两个间距接近的层重叠.)
-       autoH: 按高度等比缩放, 宽度无法适应屏幕,中间元素自适应居中但不能超过想要适应的最小屏幕宽,背景可设置成最大宽度值(没用, 不做了)
+       autoH: 按高度等比缩放, 宽度无法适应屏幕,中间元素自适应居中但不能超过想要适应的最小屏幕宽,背景可设置成最大宽度值
        auto: 按屏幕等比缩放, 会变形.
        abs: 按实际设置绝对值不作自适应.
+       fix: 自适应修正后div位置, 只适用于第一层级div
+       
+       w 宽 h 高 top 顶边距 left 左边距 都用数字不要加px
+
+       动画:addClass css动画
+            class    初始值 
+            delay    延时
+
+       事件: gotoPage()点击跳转第二页,括号内为事件,前面加^冒泡.
+
+       bg 背景 可用颜色或图片路径.     
     */
 </script>
 
@@ -62,51 +123,52 @@
 <md-sence [style.height]='senceHeight' [style.width]='senceWidth' >
         <md-page  pagerow="1" class="sec0" layout="autoW">
               <div class="h_wrp" >
-                <div w="640" h="1008" bg="img/p1_01.jpg" top="0" left="0" delay="100" addclass="fadein fadeIn" class="start animated"></div>
-                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (^touchend)="gotoPage(0,2)"><div w="450" h="100" class="text">gotoPage()点击跳转第三页</div></div>
-                <div w="100" h="100" bg="img/fav1.png" top="300" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated"></div>
+                <div fix="true" w="640" h="1008" bg="img/p1_01.jpg" top="0" left="0" delay="100" addclass="fadein" class="start animated"></div>
+                <div fix="true" w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (^touchend)="gotoPage(0,1)">
+                    <div w="450" h="100" left="100" class="text"> 外部top已自适应,点击跳转第二页</div>
+                </div>
+                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated">
+                     <div w="450" h="100" left="100" class="text"> 外部top未自适应</div>
+                </div>
+                <i class="up"></i>
             </div>
         </md-page>
 
-        <md-page pagerow="2" class="sec1" layout="auto">
+        <md-page pagerow="2" class="sec1" layout="autoH">
             <div class="h_wrp" >
-                <div w="640" h="1008" bg="img/p1_01.jpg" top="0" left="0" delay="100" addclass="fadein fadeIn" class="start animated"></div>
-                <div w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (^touchend)="gotoPage(0,2)"><div w="450" h="100" class="text">gotoPage()点击跳转第三页</div></div>
-                <div w="100" h="100" bg="img/fav1.png" top="300" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated"></div>
+                <div fix="true" w="640" h="1008" bg="img/p1_01.jpg" top="0" left="0" delay="100" addclass="fadein fadeIn" class="start animated"></div>
+                <div fix="true" w="100" h="100"  bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (^touchend)="gotoPage(0,2)">
+                     <div w="450" h="100" left='100' class="text">外部left已自适应,点击跳转第三页</div>
+                </div>
+                <div w="100" h="100" bg="img/fav1.png" top="200" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated">
+                    <div w="450" h="100" left="100" class="text"> 外部left未自适应</div>
+                </div>
+                <i class="up"></i>
             </div>
         </md-page>
         <md-page pagerow="3" class="sec2" layout="auto">
             <div class="h_wrp">
-                <div w="100" h="100" bg="#000000" top="100" left="100" delay="600" addClass="fadeInDown" class="start animated ">
-                	<i></i>
-                	<i></i>
-                </div>                         
+                <div fix="true" w="640" h="1008" bg="img/p1_01.jpg" top="0" left="0" delay="100" addclass="fadein fadeIn" class="start animated"></div>
+                <div fix="true" w="100" h="100"  bg="img/fav1.png" top="100" left="100" delay="1600" addclass="fadein fadeInDown" class="start animated" (^touchend)="gotoPage(0,2)">
+                     <div w="450" h="100" left='100' class="text">外部left已自适应,图像变形</div>
+                </div>
+                <div w="100" h="100" bg="img/fav1.png" top="200" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated">
+                    <div w="450" h="100" left="100" class="text"> 外部left未自适应 图像变形</div>
+                </div>
+                <i class="up"></i>                       
             </div>
         </md-page>
 
-        <md-page pagerow="4" class="sec3" layout="auto">
-            <div class="h_wrp">
-                <div delay="600" addClass="fadeInDown" class="start animated ">
-                	<i></i>
-                	<i></i>
-                </div>
-                <div delay="300" addClass="fadein fadeInLeft" class="start animated"></div>
-                <div delay="100" addClass="fadein fadeInLeft" class="start animated"></div>
-                <div delay="100" addClass="fadein fadeInRight" class="start animated"></div>
-                <div delay="200" addClass="fadein fadeInLeft" class="start animated"></div>                          
-            </div>
-        </md-page>
 
-        <md-page pagerow="5" class="sec4">
+        <md-page pagerow="4" class="sec4" layout="autoW">
             <div class="h_wrp">
-                <div delay="600" addClass="fadeInDown" class="start animated ">
-                	<i></i>
-                	<i></i>
-                </div>
-                <div delay="300" addClass="fadein fadeInLeft" class="start animated"></div>
-                <div delay="100" addClass="fadein fadeInLeft" class="start animated"></div>
-                <div delay="100" addClass="fadein fadeInRight" class="start animated"></div>
-                <div delay="200" addClass="fadein fadeInLeft" class="start animated"></div>                          
+               <div fix="true" w="640" h="1008" bg="#000000" top="0" left="0" delay="100" addclass="fadein fadeIn" class="start animated"></div>
+               <div fix="true" w="100" h="100" bg="img/fav1.png" top="100" left="100" delay="1000" addclass="fadein fadeInDown" class="start animated" (^touchend)="replay(1)"></div>
+               <div fix="true" w="100" h="100" bg="img/fav1.png" top="100" left="200" delay="1200" addclass="fadein fadeInUp" class="start animated"   (^touchend)="replay(2)"></div>
+               <div fix="true" w="100" h="100" bg="img/fav1.png" top="200" left="100" delay="1400" addclass="fadein fadeInLeft" class="start animated" (^touchend)="replay(3)"></div> 
+               <div fix="true" w="100" h="100" bg="img/fav1.png" top="200" left="200" delay="1600" addclass="fadein fadeInRight" class="start animated" (^touchend)="replay(4)"></div>
+               <div fix="true" w="100" h="100" bg="img/fav1.png" top="300" left="100" delay="1700" addclass="fadein fadeInRight" class="start animated" (^touchend)="replay()"></div>
+               <div fix="true" w="100" h="100" bg="img/fav1.png" top="500" left="200" delay="1800" addclass="fadein fadeInRight" class="start animated" (^touchend)="gotoUrl('http://www.163.com')"></div>                     
             </div>
         </md-page>
  </md-sence>       

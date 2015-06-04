@@ -1,6 +1,6 @@
 //preloading
 import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap, If,ViewContainerRef} from 'angular2/angular2';
-import {MdProgressCircular} from 'Component/progress-circular/progress_circular'
+import {MdProgressCircular} from 'component/progress-circular/progress_circular'
 import {DOM} from 'angular2/src/dom/dom_adapter';
 import {Main} from 'main'
 import {Parent} from 'angular2/src/core/annotations_impl/visibility';
@@ -35,7 +35,7 @@ export class loadAsset {
     }
 
     startload() {
-        var src = ['img/arrow_down.png'];
+        var src = ['img/arrow_down.png','img/p1_01.jpg'];
         this.t = src.length;
         for (var i = 0; i < this.t; ++i) this.loadimg(src[i]);
 

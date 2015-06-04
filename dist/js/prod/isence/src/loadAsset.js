@@ -1,4 +1,4 @@
-System.register(["angular2/angular2", "Component/progress-circular/progress_circular", "angular2/src/dom/dom_adapter", "main", "angular2/src/core/annotations_impl/visibility"], function($__export) {
+System.register(["angular2/angular2", "component/progress-circular/progress_circular", "angular2/src/dom/dom_adapter", "main", "angular2/src/core/annotations_impl/visibility"], function($__export) {
   "use strict";
   var Component,
       View,
@@ -40,7 +40,7 @@ System.register(["angular2/angular2", "Component/progress-circular/progress_circ
             this.progress += s;
           },
           startload: function() {
-            var src = ['img/arrow_down.png'];
+            var src = ['img/arrow_down.png', 'img/p1_01.jpg'];
             this.t = src.length;
             for (var i = 0; i < this.t; ++i)
               this.loadimg(src[i]);

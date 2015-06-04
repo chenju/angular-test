@@ -94,7 +94,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             this.sence.pages[0].init();
           },
           onResize: function(event) {
-            console.log(event);
             this.setSize();
           },
           set pageCount(value) {
@@ -118,7 +117,24 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             this.senceWidth = (document.documentElement.clientWidth + "px");
           },
           gotoPage: function(t, n, r) {
+            if ("start" != this.tc.TOUCH)
+              return ;
             this.sence.movePage(t, n, r);
+          },
+          replay: function(n) {
+            if (isBlank(n)) {
+              this.sence.pages[this.pagNum].uninit();
+              this.sence.pages[this.pagNum].init();
+            } else {
+              this.sence.pages[this.pagNum].divs[n].uninit();
+              this.sence.pages[this.pagNum].divs[n].init();
+            }
+          },
+          gotoUrl: function(url) {
+            if ("start" != this.tc.TOUCH)
+              return ;
+            location.href = url;
+            e.preventDefault();
           },
           onChange: function(_) {
             this.setSize();
@@ -140,7 +156,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [[SettingService], [GetTouch]];
         }});
       Mdsence = (function() {
-        function Mdsence(m, tc) {
+        function Mdsence(m, tc, set) {
           this.pages = [];
           this.m = m;
           this.position = 0;
@@ -149,6 +165,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.tc = tc;
           this.n = 0;
           this.r = 0;
+          this.set = set;
           this.mainTransform = 'translate3d(0,0,0)';
         }
         return ($traceurRuntime.createClass)(Mdsence, {
@@ -158,7 +175,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             this.m.pages = this.pages;
             this.m.sence = this;
             var h = 100 / p;
-            this.pageH = document.documentElement.clientHeight;
+            this.pageH = this.set.pageH;
             for (var i = 0; i < this.pages.length; i++) {
               var page = this.pages[i];
               var top = h * i;
@@ -187,7 +204,8 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               this.n = o.pageY - this.c_y;
               this.mainTransform = this.transformForValue((this.r + this.n));
             }
-            this.tc.TOUCH = 'move';
+            if (Math.abs(this.n) > 5)
+              this.tc.TOUCH = 'move';
           },
           onTouchEnd: function(e) {
             var $__0 = this;
@@ -206,7 +224,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             this.mainTransform = this.transformForValue(parseInt(-this.m.pagNum * this.pageH));
             setTimeout((function() {
               $__0.transition = "";
-            }), 500);
+            }), 200);
           },
           movePage: function(t, n, r) {
             var $__0 = this;
@@ -268,7 +286,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           })];
         }});
       Object.defineProperty(Mdsence, "parameters", {get: function() {
-          return [[Main], [GetTouch]];
+          return [[Main], [GetTouch], [SettingService]];
         }});
       Object.defineProperty(Mdsence.prototype.addPage, "parameters", {get: function() {
           return [[Mdpage]];
@@ -280,12 +298,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.divs = [];
         }
         return ($traceurRuntime.createClass)(Mdpage, {
-          set pagerow(value) {
-            this._pagerow = isString(value) ? NumberWrapper.parseInt(value, 10) : value;
-          },
-          get pagerow() {
-            return this._rowspan;
-          },
           init: function() {
             for (var i = 0; i < this.divs.length; i++) {
               this.divs[i].init();
@@ -301,9 +313,9 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           },
           onAllChangesDone: function() {},
           onChange: function(_) {
-            if (!this.isRegisteredWithGridList) {
+            if (!this.isRegisteredWithPageList) {
               this.pageList.addPage(this);
-              this.isRegisteredWithGridList = true;
+              this.isRegisteredWithPageList = true;
             }
           }
         }, {});
@@ -321,10 +333,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               'styleWidth': 'style.width',
               'styleTop': 'style.top'
             },
-            hostListeners: {
-              'mouseover': 'onMouseOver(event)',
-              'mousedown': 'onMouseDown(event)'
-            },
             lifecycle: [onChange, onAllChangesDone]
           })];
         }});
@@ -340,10 +348,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           this.set = set;
         }
         return ($traceurRuntime.createClass)(SetStyle, {
-          getInit: function() {
-            console.log('aaaaa');
-            return this.page.init;
-          },
           init: function() {
             var that = this;
             if (!isBlank(that.addClass)) {
@@ -356,13 +360,11 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             this.ClassMap = this.orgClass;
           },
           onChange: function(_) {
-            console.log(this);
             this.layout();
           },
           layout: function() {
             this.ClassMap = this.orgClass;
             var mode = this.page.layout;
-            console.log(this.styleTop);
             var h = this.set.pageH,
                 w = this.set.pageW,
                 fh = 1008 / h,
@@ -371,11 +373,33 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
                 ow = 640;
             switch (mode) {
               case ("autoW"):
-                this.styleHeight_ = this.styleHeight / fw + 'px';
-                this.styleWidth_ = this.styleWidth / fw + 'px';
-                this.styleLeft_ = this.styleLeft / fw + 'px';
-                this.styleTop_ = ((h - oh) / 2 + this.styleTop) / fw + 'px';
-                console.log(h);
+                var fix = 0;
+                if (this.fix)
+                  fix = parseInt(h - oh / fw) / 2;
+                this.styleHeight = this.styleHeight / fw + 'px';
+                this.styleWidth = this.styleWidth / fw + 'px';
+                this.styleLeft = parseInt(this.styleLeft) / fw + 'px';
+                this.styleTop = (fix + parseInt(this.styleTop) / fw) + 'px';
+                break;
+              case ("autoH"):
+                var fix = 0;
+                if (this.fix)
+                  fix = parseInt(w - ow / fh) / 2;
+                this.styleHeight = this.styleHeight / fh + 'px';
+                this.styleWidth = this.styleWidth / fh + 'px';
+                this.styleTop = this.styleTop / fh + 'px';
+                this.styleLeft = (fix + parseInt(this.styleLeft) / fh) + 'px';
+                break;
+              case ("auto"):
+                var fixX = 0,
+                    fixY = 0;
+                if (this.fix) {
+                  fixX = parseInt(w - ow / fw) / 2, fixY = parseInt(h - oh / fh) / 2;
+                }
+                this.styleHeight = this.styleHeight / fh + 'px';
+                this.styleWidth = this.styleWidth / fw + 'px';
+                this.styleTop = (fixY + parseInt(this.styleTop) / fh) + 'px';
+                this.styleLeft = (fixX + parseInt(this.styleLeft) / fw) + 'px';
                 break;
             }
             if (!isBlank(this.background)) {
@@ -385,9 +409,9 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
                 this.styleBackground = this.background;
               }
             }
-            if (!this.isRegisteredWithGridList) {
+            if (!this.isRegisteredWithDivList) {
               this.page.addDiv(this);
-              this.isRegisteredWithGridList = true;
+              this.isRegisteredWithDivList = true;
             }
           }
         }, {});
@@ -405,13 +429,13 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
               'addClass': 'addclass',
               'delay': 'delay',
               'orgClass': 'class',
-              'inited': 'init'
+              'fix': 'fix'
             },
             hostProperties: {
-              'styleHeight_': 'style.height',
-              'styleWidth_': 'style.width',
-              'styleTop_': 'style.top',
-              'styleLeft_': 'style.left',
+              'styleHeight': 'style.height',
+              'styleWidth': 'style.width',
+              'styleTop': 'style.top',
+              'styleLeft': 'style.left',
               'styleMarginTop': 'style.marginTop',
               'styleBackground': 'style.backgroundColor',
               'styleBackgroundImage': 'style.backgroundImage',
@@ -424,9 +448,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           return [[Mdpage, new Ancestor], [SettingService]];
         }});
       SettingService = (function() {
-        function SettingService() {
-          this.greeting = 'hello';
-        }
+        function SettingService() {}
         return ($traceurRuntime.createClass)(SettingService, {
           get pageH() {
             return document.documentElement.clientHeight;
