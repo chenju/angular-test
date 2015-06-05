@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="shortcut icon" href="img/fav1.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta content="width=640,user-scalable=no,minimal-ui,target-densitydpi=device-dpi" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <title>微信html5动画场景模板</title>
+    <link type="text/css" rel="stylesheet" href="lib/animate.css?t=1111" />
+
+
+    <!-- ES6-related imports -->
+    <script src="lib/traceur-runtime.js"></script>
+    <script src="lib/es6-module-loader-sans-promises.src.js"></script>
+    <script src="lib/extension-register.js"></script>
+    <script>
+        register(System);
+    </script>
+
+    <!-- Angular2-related imports -->
+    <script src="lib/zone.js"></script>
+    <script src="lib/long-stack-trace-zone.js"></script>
+    <script src="lib/angular2.js"></script>
+</head>
+<style type="text/css">
+    html,body{
+        margin: 0px;
+        width:  100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    myapp{
+        position: absolute;
+        width:100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    md-imageview{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .image{
+
+        position: absolute;
+        width: 50%;
+        height: 100%;
+        margin-left: -25%;
+        left: 50%;
+        background-size:100% 100%; 
+        top: 0px;
+
+    }
+</style>
+<body>
+    <myapp>
+        Loading...
+    </myapp>
+</body>
+
+<!-- Application bootstrap logic -->
+<script>
+    System.import('imageview').catch(console.log.bind(console));
+</script>
+
+</html>

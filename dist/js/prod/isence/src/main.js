@@ -483,7 +483,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         function pageDivStyle() {}
         return ($traceurRuntime.createClass)(pageDivStyle, {}, {});
       }());
-      bootstrap(Main);
     }
   };
 });
