@@ -1,15 +1,17 @@
-System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadAsset", "angular2/src/core/annotations_impl/visibility", "angular2/src/facade/collection", "angular2/src/facade/math", "angular2/src/facade/lang", "angular2/src/core/annotations_impl/annotations", "angular2/src/core/annotations_impl/di"], function($__export) {
+System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadAsset", "angular2/src/core/annotations_impl/visibility", "angular2/src/facade/collection", "angular2/src/facade/math", "angular2/src/facade/lang", "angular2/src/core/annotations_impl/annotations", "angular2/di"], function($__export) {
   "use strict";
   var Injectable,
       Component,
       View,
       bootstrap,
       If,
+      NgFor,
       ElementRef,
       onChange,
       onAllChangesDone,
       CSSClass,
       EventEmitter,
+      QueryList,
       loadAsset,
       Parent,
       Ancestor,
@@ -21,9 +23,16 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       NumberWrapper,
       RegExpWrapper,
       Directive,
+      Query,
+      Inject,
+      resolveForwardRef,
+      bind,
       Attribute,
+      forwardRef,
       isBlank,
+      Lock,
       ImgView,
+      TextDirective,
       Img,
       setStyle;
   return {
@@ -34,11 +43,13 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       View = $__m.ViewAnnotation;
       bootstrap = $__m.bootstrap;
       If = $__m.If;
+      NgFor = $__m.NgFor;
       ElementRef = $__m.ElementRef;
       onChange = $__m.onChange;
       onAllChangesDone = $__m.onAllChangesDone;
       CSSClass = $__m.CSSClass;
       EventEmitter = $__m.EventEmitter;
+      QueryList = $__m.QueryList;
     }, function($__m) {
       loadAsset = $__m.loadAsset;
     }, function($__m) {
@@ -57,14 +68,28 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
       isBlank = $__m.isBlank;
     }, function($__m) {
       Directive = $__m.Directive;
+      Query = $__m.Query;
+      Inject = $__m.Inject;
     }, function($__m) {
+      resolveForwardRef = $__m.resolveForwardRef;
+      bind = $__m.bind;
       Attribute = $__m.Attribute;
+      forwardRef = $__m.forwardRef;
     }],
     execute: function() {
+      Lock = (function() {
+        function Lock() {
+          this.name = 'lock';
+        }
+        return ($traceurRuntime.createClass)(Lock, {}, {});
+      }());
+      Object.defineProperty(Lock, "annotations", {get: function() {
+          return [new Directive({selector: 'lock'})];
+        }});
       ImgView = (function() {
         function ImgView() {
-          this.path = "http://www.pagefilp.com/~darkwingcj/monster/(C80)/";
-          this.prefix = "(M)mon11_";
+          this.path = "http://www.pagefilp.com/~darkwingcj/monster/";
+          this.prefix = "";
           this.pagNum = 1;
         }
         return ($traceurRuntime.createClass)(ImgView, {
@@ -88,12 +113,23 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             selector: 'myapp',
             hostListeners: {'window:resize': 'onResize($event)'}
           }), new View({
-            template: "<input #path (keyup)=\"changePrefix($event)\"></input>\n              <input #prefix (keyup)=\"changePath($event)\"></input>\n                <md-imgView>\n               </md-imgView>",
+            template: "<input #path (keyup)=\"changePrefix($event)\"></input>\n              <input #prefix (keyup)=\"changePath($event)\"></input>\n                <md-imgView>\n               </md-imgView>\n               <div text='1'></div>\n               <lock></lock>",
             directives: [Img]
           })];
         }});
+      TextDirective = (function() {
+        function TextDirective() {}
+        return ($traceurRuntime.createClass)(TextDirective, {}, {});
+      }());
+      Object.defineProperty(TextDirective, "annotations", {get: function() {
+          return [new Directive({
+            selector: '[text]',
+            properties: ['text']
+          }), new Injectable()];
+        }});
       Img = (function() {
-        function Img(m) {
+        function Img(m, lock) {
+          console.log(locks);
           this.getUrl = '';
           this.m = m;
         }
@@ -113,6 +149,7 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
             if (n > 0)
               this.gotoPage(parseInt(n));
           },
+          preLoad: function(n, t) {},
           gotoPage: function(n) {
             this.m.pagNum = n;
             if (n < 10)
@@ -136,7 +173,9 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
           })];
         }});
       Object.defineProperty(Img, "parameters", {get: function() {
-          return [[ImgView]];
+          return [[ImgView], [Lock, new Inject(forwardRef((function() {
+            return Lock;
+          })))]];
         }});
       setStyle = (function() {
         function setStyle(img) {
@@ -145,7 +184,6 @@ System.register(["angular2/src/di/annotations_impl", "angular2/angular2", "loadA
         }
         return ($traceurRuntime.createClass)(setStyle, {}, {});
       }());
-      $__export("setStyle", setStyle);
       Object.defineProperty(setStyle, "annotations", {get: function() {
           return [new Directive({
             selector: '[show]',
