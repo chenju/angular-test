@@ -35,7 +35,7 @@ export class loadAsset {
     }
 
     startload() {
-        var src = ['img/arrow_down.png','img/p1_01.jpg'];
+        var src = ['img/arrow_down.png','img/p_01.jpg'];
         this.t = src.length;
         for (var i = 0; i < this.t; ++i) this.loadimg(src[i]);
 
